@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>riboplot.ribocore &mdash; RiboPlot 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="RiboPlot 0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">RiboPlot</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for riboplot.ribocore</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;Common functions. &quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pysam</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+
+<span class="c"># create logger for the entire program</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;riboplot&#39;</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="c"># create console handler with a higher log level</span>
+<span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> - </span><span class="si">%(module)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M:%S&#39;</span><span class="p">)</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ArgumentError"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.ArgumentError">[docs]</a><span class="k">class</span> <span class="nc">ArgumentError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when invalid arguments are sent in the command line.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="RiboPlotError"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.RiboPlotError">[docs]</a><span class="k">class</span> <span class="nc">RiboPlotError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;General errors relating to riboplot.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="RiboCountError"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.RiboCountError">[docs]</a><span class="k">class</span> <span class="nc">RiboCountError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;General errors relating to ribocount.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="RNACountsError"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.RNACountsError">[docs]</a><span class="k">class</span> <span class="nc">RNACountsError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For errors related to RNA Coverage generation using bedtools. &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="is_bam_valid"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.is_bam_valid">[docs]</a><span class="k">def</span> <span class="nf">is_bam_valid</span><span class="p">(</span><span class="n">bam_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if bam file is valid. Raises a ValueError if pysam cannot read the file.</span>
+
+<span class="sd">    #TODO: pysam  does not differentiate between BAM and SAM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">bam_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="bam_has_index"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.bam_has_index">[docs]</a><span class="k">def</span> <span class="nf">bam_has_index</span><span class="p">(</span><span class="n">bam_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if bam file has an index. Returns True/False.&quot;&quot;&quot;</span>
+    <span class="n">has_index</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">with</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">bam_file</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">bam_fileobj</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bam_fileobj</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">bam_fileobj</span><span class="o">.</span><span class="n">references</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="s">&#39;fetch called on bamfile without index&#39;</span><span class="p">:</span>
+                <span class="n">bam_fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">has_index</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">has_index</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="n">has_index</span>
+
+</div>
+<div class="viewcode-block" id="create_bam_index"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.create_bam_index">[docs]</a><span class="k">def</span> <span class="nf">create_bam_index</span><span class="p">(</span><span class="n">bam_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an index for the given BAM file.&quot;&quot;&quot;</span>
+    <span class="n">pysam</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bam_file</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_bam_read_lengths"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.get_bam_read_lengths">[docs]</a><span class="k">def</span> <span class="nf">get_bam_read_lengths</span><span class="p">(</span><span class="n">bam_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For a given BAM file, return an unique list of read lengths present.&quot;&quot;&quot;</span>
+    <span class="n">read_lengths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">bam_file</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">bam_fileobj</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">bam_fileobj</span><span class="p">:</span>
+            <span class="n">read_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">query_length</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">read_lengths</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="is_fasta_valid"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.is_fasta_valid">[docs]</a><span class="k">def</span> <span class="nf">is_fasta_valid</span><span class="p">(</span><span class="n">fasta_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if fasta file is valid. Raises a ValueError if pysam cannot read the file.</span>
+
+<span class="sd">    #TODO: pysam  does not differentiate between BAM and SAM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">FastaFile</span><span class="p">(</span><span class="n">fasta_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="get_fasta_record"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.get_fasta_record">[docs]</a><span class="k">def</span> <span class="nf">get_fasta_record</span><span class="p">(</span><span class="n">fasta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a single transcript name from a valid fasta file&quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">FastaFile</span><span class="p">(</span><span class="n">fasta</span><span class="p">)</span>
+    <span class="n">transcript</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">references</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">transcript</span>
+
+</div>
+<div class="viewcode-block" id="get_fasta_records"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.get_fasta_records">[docs]</a><span class="k">def</span> <span class="nf">get_fasta_records</span><span class="p">(</span><span class="n">fasta</span><span class="p">,</span> <span class="n">transcripts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return list of transcript records from the given fasta file.</span>
+<span class="sd">    Each record will be of the form {&#39;sequence_id&#39;: {&#39;sequence&#39;: &#39;AAA&#39;, &#39;length&#39;: 3}}</span>
+
+<span class="sd">    trascripts should be provided as a list of sequence id&#39;s.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">FastaFile</span><span class="p">(</span><span class="n">fasta</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">transcript</span> <span class="ow">in</span> <span class="n">transcripts</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sequence</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">transcript</span><span class="p">),</span> <span class="n">f</span><span class="o">.</span><span class="n">get_reference_length</span><span class="p">(</span><span class="n">transcript</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Transcript &quot;{}&quot; does not exist in transcriptome FASTA file&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">records</span><span class="p">[</span><span class="n">transcript</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;sequence&#39;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">,</span> <span class="s">&#39;length&#39;</span><span class="p">:</span> <span class="n">length</span><span class="p">}</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">records</span>
+
+</div>
+<div class="viewcode-block" id="get_ribo_counts"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.get_ribo_counts">[docs]</a><span class="k">def</span> <span class="nf">get_ribo_counts</span><span class="p">(</span><span class="n">ribo_fileobj</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">,</span> <span class="n">read_length</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get total reads and read counts in all 3 frames for the give transcript</span>
+<span class="sd">    from input BAM file (indexed).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">read_counts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">total_reads</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">ribo_fileobj</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">transcript_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">read_length</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">query_length</span> <span class="o">!=</span> <span class="n">read_length</span><span class="p">:</span>
+                <span class="k">continue</span>
+        <span class="n">total_reads</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">read_counts</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">read_counts</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="n">rem</span> <span class="o">=</span> <span class="n">position</span> <span class="o">%</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="n">rem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">read_counts</span><span class="p">[</span><span class="n">position</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">read_counts</span><span class="p">[</span><span class="n">position</span><span class="p">][</span><span class="n">rem</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">read_counts</span><span class="p">,</span> <span class="n">total_reads</span>
+
+</div>
+<div class="viewcode-block" id="check_required_arguments"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.check_required_arguments">[docs]</a><span class="k">def</span> <span class="nf">check_required_arguments</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">,</span> <span class="n">transcriptome_fasta</span><span class="p">,</span> <span class="n">transcript_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check required arguments of both riboplot and ribocount.&quot;&quot;&quot;</span>
+    <span class="c"># Is this a valid BAM file? i.e., can pysam read it?</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">is_bam_valid</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;The given RiboSeq BAM file is not valid&#39;</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="c"># Does the BAM file have an index? If not, create it.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">bam_has_index</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Creating an index for the BAM file...&#39;</span><span class="p">)</span>
+        <span class="n">create_bam_index</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">)</span>
+
+    <span class="c"># Is FASTA file valid?</span>
+    <span class="n">fasta_valid</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fasta_valid</span> <span class="o">=</span> <span class="n">is_fasta_valid</span><span class="p">(</span><span class="n">transcriptome_fasta</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Transcriptome FASTA file is not valid&#39;</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">if</span> <span class="n">fasta_valid</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">transcript_name</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">get_fasta_records</span><span class="p">(</span><span class="n">transcriptome_fasta</span><span class="p">,</span> <span class="p">[</span><span class="n">transcript_name</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Could not get FASTA sequence of &quot;{}&quot; from transcriptome FASTA file&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_name</span><span class="p">))</span>
+                <span class="k">raise</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># ribocount doesn&#39;t have a transcript option so we get the first</span>
+            <span class="c"># sequence name from the fasta file</span>
+            <span class="n">transcript_name</span> <span class="o">=</span>  <span class="n">get_fasta_record</span><span class="p">(</span><span class="n">transcriptome_fasta</span><span class="p">)</span>
+
+        <span class="c"># check if transcript also exists in BAM</span>
+        <span class="k">with</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">bam_file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">transcript_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bam_file</span><span class="o">.</span><span class="n">references</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Transcript &quot;{}&quot; does not exist in BAM file&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_name</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="check_optional_arguments"><a class="viewcode-back" href="../../riboplot.html#riboplot.ribocore.check_optional_arguments">[docs]</a><span class="k">def</span> <span class="nf">check_optional_arguments</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">,</span> <span class="n">read_length</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">read_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rna_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check all optional arguments.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rna_file</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&#39;bedtools&#39;</span><span class="p">,</span> <span class="s">&#39;--version&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Could not find bedtools in PATH. bedtools is required&#39;</span>
+                      <span class="s">&#39;for generating RNA coverage plot.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="c"># Is this a valid BAM file? i.e., can pysam read it?</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">is_bam_valid</span><span class="p">(</span><span class="n">rna_file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;The given RNASeq BAM file is not valid&#39;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="c"># If read_length is given, it must be a positive integer or reads of that</span>
+    <span class="c"># length must exist in the BAM file</span>
+    <span class="k">if</span> <span class="n">read_length</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">read_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Read length must be a positive value&#39;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">bam_read_lengths</span> <span class="o">=</span> <span class="n">get_bam_read_lengths</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">read_length</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bam_read_lengths</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Reads of the length &quot;{}&quot; does not exist in the BAM file&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">read_length</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c"># If read_offset is given, it must be a positive integer</span>
+    <span class="k">if</span> <span class="n">read_offset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">read_offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Read offset must be 0 or greater&#39;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ArgumentError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/riboplot-logo.png" alt="Logo"/>
+            </a></p><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <!--<h3>Search</h3>-->
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search"/>
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+       <small>
+        Last updated on Aug 26, 2015.
+        </small>
+
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

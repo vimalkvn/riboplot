@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Usage &mdash; RiboPlot 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RiboPlot 0.1.0 documentation" href="index.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="contributing.html" title="Contributing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RiboPlot</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="usage">
+<span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="riboplot">
+<h2>RiboPlot<a class="headerlink" href="#riboplot" title="Permalink to this headline">¶</a></h2>
+<p>Plot and output Ribo-Seq read counts of a single transcript from an alignment file (sorted BAM).</p>
+<div class="section" id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="ribo-seq-alignment-file-sorted-bam-file">
+<h4>1. Ribo-Seq alignment file (Sorted BAM file)<a class="headerlink" href="#ribo-seq-alignment-file-sorted-bam-file" title="Permalink to this headline">¶</a></h4>
+<p>A Bowtie 1 output (BAM) from an alignment of Ribo-Seq data to the transcriptome. This BAM
+file should be sorted. This can be done using one of the following methods.</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://ribogalaxy.ucc.ie">RiboGalaxy</a> -&gt; Sort Data -&gt; Sort BAM dataset.</li>
+<li><code class="docutils literal"><span class="pre">samtools</span> <span class="pre">sort</span> <span class="pre">input.bam</span> <span class="pre">inputsorted</span></code></li>
+</ol>
+</div>
+<div class="section" id="transcriptome-fasta">
+<h4>2. Transcriptome (FASTA)<a class="headerlink" href="#transcriptome-fasta" title="Permalink to this headline">¶</a></h4>
+<p>A FASTA format file with sequences of the transcripts.</p>
+</div>
+<div class="section" id="name-of-the-transcript-to-plot-text">
+<h4>3. Name of the transcript to plot (Text)<a class="headerlink" href="#name-of-the-transcript-to-plot-text" title="Permalink to this headline">¶</a></h4>
+<p>The name of the transcript to plot <strong>should</strong> match the name in the transcriptome (FASTA)
+and the Ribo-Seq/RNA-Seq alignment (BAM).</p>
+</div>
+<div class="section" id="rna-coverage-optional-sorted-bam-file">
+<h4>4. RNA coverage [optional] (Sorted BAM file)<a class="headerlink" href="#rna-coverage-optional-sorted-bam-file" title="Permalink to this headline">¶</a></h4>
+<p>If you have RNA-Seq data (sorted BAM), you can select the option to plot RNA coverage.</p>
+</div>
+<div class="section" id="read-lengths-to-consider-optional-integer-0-or-greater">
+<h4>5. Read lengths to consider [Optional] (Integer - 0 or greater)<a class="headerlink" href="#read-lengths-to-consider-optional-integer-0-or-greater" title="Permalink to this headline">¶</a></h4>
+<p>If this option is provided, only Ribo-Seq data of the given length is considered.</p>
+</div>
+<div class="section" id="offset-optional-integer-0-or-greater">
+<h4>6. Offset [optional] (Integer - 0 or greater)<a class="headerlink" href="#offset-optional-integer-0-or-greater" title="Permalink to this headline">¶</a></h4>
+<p>If this option is provided, this offset is added to the read alignment positions.</p>
+</div>
+</div>
+<div class="section" id="output">
+<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="plots-png-and-svg">
+<h4>1. Plots (PNG and SVG)<a class="headerlink" href="#plots-png-and-svg" title="Permalink to this headline">¶</a></h4>
+<p>Ribo-Seq read counts as a bar plot in 3 frames (color codes: 1: red, 2: green, 3: blue)</p>
+<p>RNA coverage as a gray background (if the RNA coverage option was selected).</p>
+<p>The open reading frame architecture appears below the plot with start (ATG) and stop codons (&#8216;TAA&#8217;, &#8216;TAG&#8217;, &#8216;TGA&#8217;) in all 3 frames.</p>
+<p>The color codes are start (white) and stop (dark gray).</p>
+<img alt="_images/riboplot.png" src="_images/riboplot.png" />
+</div>
+<div class="section" id="riboseq-read-counts-csv">
+<h4>2. RiboSeq read counts (CSV)<a class="headerlink" href="#riboseq-read-counts-csv" title="Permalink to this headline">¶</a></h4>
+<p>In 3 frames for each position in the transcript.</p>
+</div>
+</div>
+<div class="section" id="command-line">
+<h3>Command line<a class="headerlink" href="#command-line" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">riboplot</span></code> can also be run on the command line. The usage is</p>
+<div class="highlight-python"><div class="highlight"><pre>usage: riboplot [-h] -b RIBO_FILE -f TRANSCRIPTOME_FASTA -t TEXT
+                [-n RNA_FILE] [-l INTEGER] [-s INTEGER] [-m HTML_FILE]
+                [-o OUTPUT_PATH] [-d]
+
+Plot and output read counts for a single transcript
+
+optional arguments:
+-h, --help
+    show this help message and exit
+
+-n RNA_FILE, --rna_file RNA_FILE
+    RNA-Seq alignment file (BAM)
+
+-l INTEGER, --read_length INTEGER
+    Read length to consider (default: None)
+
+-s INTEGER, --read_offset INTEGER
+    Read offset (default: 0)
+
+-m HTML_FILE, --html_file HTML_FILE
+    Output file for results (HTML)
+
+-o OUTPUT_PATH, --output_path OUTPUT_PATH
+    Files are saved in this directory
+
+-d, --debug
+    Flag. Produce debug output
+
+required arguments:
+-b RIBO_FILE, --ribo_file RIBO_FILE
+    Ribo-Seq alignment file in BAM format
+
+-f TRANSCRIPTOME_FASTA, --transcriptome_fasta TRANSCRIPTOME_FASTA
+    FASTA format file of the transcriptome
+
+-t TEXT, --transcript_name TEXT
+    Transcript name
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="ribocount">
+<h2>RiboCount<a class="headerlink" href="#ribocount" title="Permalink to this headline">¶</a></h2>
+<p>Output read counts for all transcripts in an alignment.</p>
+<div class="section" id="id2">
+<h3>Parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>1. Ribo-Seq alignment file (Sorted BAM file)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>A Bowtie 1 output (BAM) from an alignment of Ribo-Seq data to the transcriptome. This BAM
+file should be sorted. This can be done using one of the following methods.</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://ribogalaxy.ucc.ie">RiboGalaxy</a> -&gt; Sort Data -&gt; Sort BAM dataset.</li>
+<li><code class="docutils literal"><span class="pre">samtools</span> <span class="pre">sort</span> <span class="pre">input.bam</span> <span class="pre">inputsorted</span></code></li>
+</ol>
+</div>
+<div class="section" id="id4">
+<h4>2. Transcriptome (FASTA)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>A FASTA format file with sequences of the transcripts.</p>
+</div>
+<div class="section" id="id5">
+<h4>3. Read lengths to consider [optional] (Integer - 0 or greater)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>If this option is provided, only Ribo-Seq data of the given length is considered.</p>
+</div>
+<div class="section" id="id6">
+<h4>4. Offset [optional] (Integer - 0 or greater)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>If this option is provided, this offset is added to the read alignment positions.</p>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>Output<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="read-counts-for-all-transcripts-in-the-alignment-zip">
+<h4>Read counts for all transcripts in the alignment (ZIP)<a class="headerlink" href="#read-counts-for-all-transcripts-in-the-alignment-zip" title="Permalink to this headline">¶</a></h4>
+<p>The output file <code class="docutils literal"><span class="pre">ribocount_output.zip</span></code> should first be uncompressed. This will generate
+a folder called <code class="docutils literal"><span class="pre">ribocount_output</span></code>. Open <code class="docutils literal"><span class="pre">index.html</span></code> in a web browser to view the results of ribocount.</p>
+<p>Total reads for each transcript will be displayed in a table along with the name of the transcript and a link
+to the CSV file containing the read counts in 3 frames for each position in the transcript.</p>
+<img alt="_images/ribocount.png" src="_images/ribocount.png" />
+</div>
+</div>
+<div class="section" id="id8">
+<h3>Command line<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">ribocount</span></code> can also be run on the command line. The usage is</p>
+<div class="highlight-python"><div class="highlight"><pre>usage: ribocount [-h] -b RIBO_FILE -f TRANSCRIPTOME_FASTA [-l INTEGER]
+[-s INTEGER] [-m HTML_FILE] [-o OUTPUT_PATH] [-d]
+
+Output read counts for all transcripts
+
+optional arguments:
+
+    -h, --help            show this help message and exit
+
+    -l INTEGER, --read_length INTEGER
+        Read length to consider (default: None)
+
+    -s INTEGER, --read_offset INTEGER
+        Read offset (default: 0)
+
+    -m HTML_FILE, --html_file HTML_FILE
+
+        Output file for results (HTML)
+
+    -o OUTPUT_PATH, --output_path OUTPUT_PATH
+        Files are saved in this directory
+
+    -d, --debug           Flag. Produce debug output
+
+required arguments:
+
+    -b RIBO_FILE, --ribo_file RIBO_FILE
+        Ribo-Seq alignment file in BAM format
+
+    -f TRANSCRIPTOME_FASTA, --transcriptome_fasta TRANSCRIPTOME_FASTA
+        FASTA format file of the transcriptome
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/riboplot-logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#riboplot">RiboPlot</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a><ul>
+<li><a class="reference internal" href="#ribo-seq-alignment-file-sorted-bam-file">1. Ribo-Seq alignment file (Sorted BAM file)</a></li>
+<li><a class="reference internal" href="#transcriptome-fasta">2. Transcriptome (FASTA)</a></li>
+<li><a class="reference internal" href="#name-of-the-transcript-to-plot-text">3. Name of the transcript to plot (Text)</a></li>
+<li><a class="reference internal" href="#rna-coverage-optional-sorted-bam-file">4. RNA coverage [optional] (Sorted BAM file)</a></li>
+<li><a class="reference internal" href="#read-lengths-to-consider-optional-integer-0-or-greater">5. Read lengths to consider [Optional] (Integer - 0 or greater)</a></li>
+<li><a class="reference internal" href="#offset-optional-integer-0-or-greater">6. Offset [optional] (Integer - 0 or greater)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#output">Output</a><ul>
+<li><a class="reference internal" href="#plots-png-and-svg">1. Plots (PNG and SVG)</a></li>
+<li><a class="reference internal" href="#riboseq-read-counts-csv">2. RiboSeq read counts (CSV)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#command-line">Command line</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ribocount">RiboCount</a><ul>
+<li><a class="reference internal" href="#id2">Parameters</a><ul>
+<li><a class="reference internal" href="#id3">1. Ribo-Seq alignment file (Sorted BAM file)</a></li>
+<li><a class="reference internal" href="#id4">2. Transcriptome (FASTA)</a></li>
+<li><a class="reference internal" href="#id5">3. Read lengths to consider [optional] (Integer - 0 or greater)</a></li>
+<li><a class="reference internal" href="#id6">4. Offset [optional] (Integer - 0 or greater)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">Output</a><ul>
+<li><a class="reference internal" href="#read-counts-for-all-transcripts-in-the-alignment-zip">Read counts for all transcripts in the alignment (ZIP)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">Command line</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Contributing</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/usage.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <!--<h3>Search</h3>-->
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search"/>
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+       <small>
+        Last updated on Aug 26, 2015.
+        </small>
+
+      
+      |
+      <a href="_sources/usage.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

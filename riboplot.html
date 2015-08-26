@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>riboplot package &mdash; RiboPlot 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RiboPlot 0.1.0 documentation" href="index.html" />
+    <link rel="up" title="riboplot" href="modules.html" />
+    <link rel="prev" title="riboplot" href="modules.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="riboplot"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RiboPlot</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">riboplot</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="riboplot-package">
+<h1>riboplot package<a class="headerlink" href="#riboplot-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-riboplot.config">
+<span id="riboplot-config-module"></span><h2>riboplot.config module<a class="headerlink" href="#module-riboplot.config" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="riboplot.config.Config">
+<em class="property">class </em><code class="descclassname">riboplot.config.</code><code class="descname">Config</code><a class="reference internal" href="_modules/riboplot/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.config.Config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="riboplot.config.Config.APP_DIR">
+<code class="descname">APP_DIR</code><em class="property"> = '/home/vimal/Workspace/ribogalaxy_tools/riboplot'</em><a class="headerlink" href="#riboplot.config.Config.APP_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="riboplot.config.Config.PKG_DATA_DIR">
+<code class="descname">PKG_DATA_DIR</code><em class="property"> = '/home/vimal/Workspace/ribogalaxy_tools/riboplot/riboplot/data'</em><a class="headerlink" href="#riboplot.config.Config.PKG_DATA_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="riboplot.config.ProductionConfig">
+<em class="property">class </em><code class="descclassname">riboplot.config.</code><code class="descname">ProductionConfig</code><a class="reference internal" href="_modules/riboplot/config.html#ProductionConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.config.ProductionConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#riboplot.config.Config" title="riboplot.config.Config"><code class="xref py py-class docutils literal"><span class="pre">riboplot.config.Config</span></code></a></p>
+<p>Production configuration</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="riboplot.config.TestingConfig">
+<em class="property">class </em><code class="descclassname">riboplot.config.</code><code class="descname">TestingConfig</code><a class="reference internal" href="_modules/riboplot/config.html#TestingConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.config.TestingConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#riboplot.config.Config" title="riboplot.config.Config"><code class="xref py py-class docutils literal"><span class="pre">riboplot.config.Config</span></code></a></p>
+<p>Testing configuration</p>
+<dl class="attribute">
+<dt id="riboplot.config.TestingConfig.TEST_DATA_DIR">
+<code class="descname">TEST_DATA_DIR</code><em class="property"> = '/home/vimal/Workspace/ribogalaxy_tools/riboplot/tests/data'</em><a class="headerlink" href="#riboplot.config.TestingConfig.TEST_DATA_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-riboplot.ribocore">
+<span id="riboplot-ribocore-module"></span><h2>riboplot.ribocore module<a class="headerlink" href="#module-riboplot.ribocore" title="Permalink to this headline">¶</a></h2>
+<p>Common functions.</p>
+<dl class="exception">
+<dt id="riboplot.ribocore.ArgumentError">
+<em class="property">exception </em><code class="descclassname">riboplot.ribocore.</code><code class="descname">ArgumentError</code><a class="reference internal" href="_modules/riboplot/ribocore.html#ArgumentError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.ArgumentError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>Raised when invalid arguments are sent in the command line.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="riboplot.ribocore.RNACountsError">
+<em class="property">exception </em><code class="descclassname">riboplot.ribocore.</code><code class="descname">RNACountsError</code><a class="reference internal" href="_modules/riboplot/ribocore.html#RNACountsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.RNACountsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>For errors related to RNA Coverage generation using bedtools.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="riboplot.ribocore.RiboCountError">
+<em class="property">exception </em><code class="descclassname">riboplot.ribocore.</code><code class="descname">RiboCountError</code><a class="reference internal" href="_modules/riboplot/ribocore.html#RiboCountError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.RiboCountError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>General errors relating to ribocount.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="riboplot.ribocore.RiboPlotError">
+<em class="property">exception </em><code class="descclassname">riboplot.ribocore.</code><code class="descname">RiboPlotError</code><a class="reference internal" href="_modules/riboplot/ribocore.html#RiboPlotError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.RiboPlotError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+<p>General errors relating to riboplot.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.bam_has_index">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">bam_has_index</code><span class="sig-paren">(</span><em>bam_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#bam_has_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.bam_has_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if bam file has an index. Returns True/False.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.check_optional_arguments">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">check_optional_arguments</code><span class="sig-paren">(</span><em>ribo_file</em>, <em>read_length=None</em>, <em>read_offset=None</em>, <em>rna_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#check_optional_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.check_optional_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check all optional arguments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.check_required_arguments">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">check_required_arguments</code><span class="sig-paren">(</span><em>ribo_file</em>, <em>transcriptome_fasta</em>, <em>transcript_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#check_required_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.check_required_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check required arguments of both riboplot and ribocount.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.create_bam_index">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">create_bam_index</code><span class="sig-paren">(</span><em>bam_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#create_bam_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.create_bam_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an index for the given BAM file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.get_bam_read_lengths">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">get_bam_read_lengths</code><span class="sig-paren">(</span><em>bam_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#get_bam_read_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.get_bam_read_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given BAM file, return an unique list of read lengths present.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.get_fasta_record">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">get_fasta_record</code><span class="sig-paren">(</span><em>fasta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#get_fasta_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.get_fasta_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a single transcript name from a valid fasta file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.get_fasta_records">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">get_fasta_records</code><span class="sig-paren">(</span><em>fasta</em>, <em>transcripts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#get_fasta_records"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.get_fasta_records" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of transcript records from the given fasta file.
+Each record will be of the form {&#8216;sequence_id&#8217;: {&#8216;sequence&#8217;: &#8216;AAA&#8217;, &#8216;length&#8217;: 3}}</p>
+<p>trascripts should be provided as a list of sequence id&#8217;s.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.get_ribo_counts">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">get_ribo_counts</code><span class="sig-paren">(</span><em>ribo_fileobj</em>, <em>transcript_name</em>, <em>read_length=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#get_ribo_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.get_ribo_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get total reads and read counts in all 3 frames for the give transcript
+from input BAM file (indexed).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.is_bam_valid">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">is_bam_valid</code><span class="sig-paren">(</span><em>bam_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#is_bam_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.is_bam_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if bam file is valid. Raises a ValueError if pysam cannot read the file.</p>
+<p>#TODO: pysam  does not differentiate between BAM and SAM</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocore.is_fasta_valid">
+<code class="descclassname">riboplot.ribocore.</code><code class="descname">is_fasta_valid</code><span class="sig-paren">(</span><em>fasta_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocore.html#is_fasta_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocore.is_fasta_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if fasta file is valid. Raises a ValueError if pysam cannot read the file.</p>
+<p>#TODO: pysam  does not differentiate between BAM and SAM</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-riboplot.ribocount">
+<span id="riboplot-ribocount-module"></span><h2>riboplot.ribocount module<a class="headerlink" href="#module-riboplot.ribocount" title="Permalink to this headline">¶</a></h2>
+<p>ribocount</p>
+<dl class="class">
+<dt id="riboplot.ribocount.ErrorLogFormatter">
+<em class="property">class </em><code class="descclassname">riboplot.ribocount.</code><code class="descname">ErrorLogFormatter</code><span class="sig-paren">(</span><em>fmt=None</em>, <em>datefmt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocount.html#ErrorLogFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocount.ErrorLogFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.Formatter</span></code></p>
+<p>Custom error log format for the HTML file</p>
+<dl class="method">
+<dt id="riboplot.ribocount.ErrorLogFormatter.format">
+<code class="descname">format</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocount.html#ErrorLogFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocount.ErrorLogFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocount.create_parser">
+<code class="descclassname">riboplot.ribocount.</code><code class="descname">create_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocount.html#create_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocount.create_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Argument parser.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocount.main">
+<code class="descclassname">riboplot.ribocount.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocount.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocount.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main program</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.ribocount.run">
+<code class="descclassname">riboplot.ribocount.</code><code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/ribocount.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.ribocount.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run program</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-riboplot.riboplot">
+<span id="riboplot-riboplot-module"></span><h2>riboplot.riboplot module<a class="headerlink" href="#module-riboplot.riboplot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="riboplot.riboplot.ErrorLogFormatter">
+<em class="property">class </em><code class="descclassname">riboplot.riboplot.</code><code class="descname">ErrorLogFormatter</code><span class="sig-paren">(</span><em>fmt=None</em>, <em>datefmt=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#ErrorLogFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.ErrorLogFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">logging.Formatter</span></code></p>
+<p>Custom error log format for the HTML file</p>
+<dl class="method">
+<dt id="riboplot.riboplot.ErrorLogFormatter.format">
+<code class="descname">format</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#ErrorLogFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.ErrorLogFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.create_parser">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">create_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#create_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.create_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Argument parser.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.get_rna_counts">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">get_rna_counts</code><span class="sig-paren">(</span><em>rna_file</em>, <em>transcript_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#get_rna_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.get_rna_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get coverage for a given RNA BAM file, return read counts.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.get_start_stops">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">get_start_stops</code><span class="sig-paren">(</span><em>transcript_sequence</em>, <em>start_codons=None</em>, <em>stop_codons=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#get_start_stops"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.get_start_stops" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return start and stop positions for all frames in the given
+transcript.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.main">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main program</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.plot_profile">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">plot_profile</code><span class="sig-paren">(</span><em>ribo_counts</em>, <em>transcript_name</em>, <em>transcript_length</em>, <em>start_stops</em>, <em>read_length=None</em>, <em>read_offset=None</em>, <em>rna_counts=None</em>, <em>html_file='index.html'</em>, <em>output_path='output'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#plot_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.plot_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot read counts (in all 3 frames) and RNA coverage if provided for a
+single transcript.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.run">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run program</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="riboplot.riboplot.set_axis_color">
+<code class="descclassname">riboplot.riboplot.</code><code class="descname">set_axis_color</code><span class="sig-paren">(</span><em>axis</em>, <em>color</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/riboplot/riboplot.html#set_axis_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#riboplot.riboplot.set_axis_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the spine color of all sides of an axis (top, right, bottom, left).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-riboplot">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-riboplot" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/riboplot-logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">riboplot package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-riboplot.config">riboplot.config module</a></li>
+<li><a class="reference internal" href="#module-riboplot.ribocore">riboplot.ribocore module</a></li>
+<li><a class="reference internal" href="#module-riboplot.ribocount">riboplot.ribocount module</a></li>
+<li><a class="reference internal" href="#module-riboplot.riboplot">riboplot.riboplot module</a></li>
+<li><a class="reference internal" href="#module-riboplot">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">riboplot</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">riboplot</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/riboplot.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <!--<h3>Search</h3>-->
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" placeholder="Search"/>
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+       <small>
+        Last updated on Aug 26, 2015.
+        </small>
+
+      
+      |
+      <a href="_sources/riboplot.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

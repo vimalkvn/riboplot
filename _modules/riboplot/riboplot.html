@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>riboplot.riboplot &mdash; RiboPlot 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="RiboPlot 0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">RiboPlot</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for riboplot.riboplot</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c"># check dependencies</span>
+<span class="n">module_errors</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pysam</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">module_errors</span><span class="p">[</span><span class="s">&#39;pysam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">module_errors</span><span class="p">[</span><span class="s">&#39;matplotlib&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">gridspec</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.font_manager</span> <span class="kn">import</span> <span class="n">FontProperties</span>
+
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">module_errors</span><span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Could not import all required modules:</span><span class="se">\n\n</span><span class="s">&#39;</span>
+    <span class="k">for</span> <span class="n">module</span><span class="p">,</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">module_errors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;Importing &quot;{0}&quot; failed with </span><span class="se">\n</span><span class="s">{1}</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">config</span>
+<span class="c"># import timeit</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="kn">import</span> <span class="nn">ribocore</span>
+<span class="c"># Default is production</span>
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ProductionConfig</span><span class="p">()</span>
+
+<span class="c"># create logger</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;riboplot&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ErrorLogFormatter"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.ErrorLogFormatter">[docs]</a><span class="k">class</span> <span class="nc">ErrorLogFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom error log format for the HTML file&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ErrorLogFormatter.format"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.ErrorLogFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;h2&gt;RiboPlot Error&lt;/h2&gt;&lt;p&gt;{}&lt;/p&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="get_start_stops"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.get_start_stops">[docs]</a><span class="k">def</span> <span class="nf">get_start_stops</span><span class="p">(</span><span class="n">transcript_sequence</span><span class="p">,</span> <span class="n">start_codons</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">stop_codons</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return start and stop positions for all frames in the given</span>
+<span class="sd">        transcript.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">start_codons</span><span class="p">:</span>
+            <span class="n">start_codons</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ATG&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">stop_codons</span><span class="p">:</span>
+            <span class="n">stop_codons</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;TAA&#39;</span><span class="p">,</span> <span class="s">&#39;TAG&#39;</span><span class="p">,</span> <span class="s">&#39;TGA&#39;</span><span class="p">]</span>
+
+        <span class="n">seq_frames</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;starts&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;stops&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+                      <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;starts&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;stops&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+                      <span class="mi">3</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;starts&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;stops&#39;</span><span class="p">:</span> <span class="p">[]}}</span>
+
+        <span class="k">for</span> <span class="n">codons</span><span class="p">,</span> <span class="n">positions</span> <span class="ow">in</span> <span class="p">((</span><span class="n">start_codons</span><span class="p">,</span> <span class="s">&#39;starts&#39;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="n">stop_codons</span><span class="p">,</span> <span class="s">&#39;stops&#39;</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">codons</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">codons</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">codons</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">pat</span><span class="p">,</span> <span class="n">transcript_sequence</span><span class="p">):</span>
+                <span class="c"># Increment position by 1, Frame 1 starts at position 1 not 0</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">rem</span> <span class="o">=</span> <span class="n">start</span> <span class="o">%</span> <span class="mi">3</span>
+                <span class="k">if</span> <span class="n">rem</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c"># frame 1</span>
+                    <span class="n">seq_frames</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">positions</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">rem</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c"># frame 2</span>
+                    <span class="n">seq_frames</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="n">positions</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">rem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c"># frame 3</span>
+                    <span class="n">seq_frames</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">positions</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">seq_frames</span>
+
+</div>
+<div class="viewcode-block" id="get_rna_counts"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.get_rna_counts">[docs]</a><span class="k">def</span> <span class="nf">get_rna_counts</span><span class="p">(</span><span class="n">rna_file</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get coverage for a given RNA BAM file, return read counts. &quot;&quot;&quot;</span>
+    <span class="c"># check if the RNA file exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rna_file</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;RNA-Seq BAM file &quot;{}&quot; does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rna_file</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">rna_counts</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">cov_file</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
+            <span class="p">[</span><span class="s">&#39;bedtools&#39;</span><span class="p">,</span> <span class="s">&#39;genomecov&#39;</span><span class="p">,</span> <span class="s">&#39;-ibam&#39;</span><span class="p">,</span> <span class="n">rna_file</span><span class="p">,</span>
+             <span class="s">&#39;-bg&#39;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">cov_file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c"># needs testing</span>
+        <span class="k">raise</span> <span class="n">ribocore</span><span class="o">.</span><span class="n">RNACountsError</span><span class="p">(</span><span class="s">&#39;Could not generate coverage for RNA BAM file. </span><span class="se">\n</span><span class="s">{}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">cov_file</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">transcript_name</span><span class="p">:</span>
+            <span class="n">position</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">rna_counts</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+    <span class="n">cov_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">cov_file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rna_counts</span>
+
+</div>
+<div class="viewcode-block" id="set_axis_color"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.set_axis_color">[docs]</a><span class="k">def</span> <span class="nf">set_axis_color</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets the spine color of all sides of an axis (top, right, bottom, left).&quot;&quot;&quot;</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">axis</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="plot_profile"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.plot_profile">[docs]</a><span class="k">def</span> <span class="nf">plot_profile</span><span class="p">(</span><span class="n">ribo_counts</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">,</span> <span class="n">transcript_length</span><span class="p">,</span>
+                 <span class="n">start_stops</span><span class="p">,</span> <span class="n">read_length</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">read_offset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rna_counts</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">html_file</span><span class="o">=</span><span class="s">&#39;index.html&#39;</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="s">&#39;output&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot read counts (in all 3 frames) and RNA coverage if provided for a</span>
+<span class="sd">    single transcript.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">height_ratios</span><span class="o">=</span><span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">6.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.35</span><span class="p">)</span>
+    <span class="n">font_xsmall</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span> <span class="s">&#39;sans-serif&#39;</span><span class="p">,</span> <span class="s">&#39;color&#39;</span><span class="p">:</span> <span class="s">&#39;#555555&#39;</span><span class="p">,</span> <span class="s">&#39;weight&#39;</span><span class="p">:</span> <span class="s">&#39;normal&#39;</span><span class="p">,</span> <span class="s">&#39;size&#39;</span><span class="p">:</span> <span class="s">&#39;x-small&#39;</span><span class="p">}</span>
+
+    <span class="c"># plot for frames legend</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axisbg</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;frame 1&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;right&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">,</span>
+             <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;tomato&#39;</span><span class="p">))</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.97</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;2&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;right&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">,</span>
+             <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;limegreen&#39;</span><span class="p">))</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;3&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;right&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">,</span>
+             <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;deepskyblue&#39;</span><span class="p">))</span>
+
+    <span class="c"># riboseq bar plots</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s">&#39;Ribo-Seq count&#39;</span>
+    <span class="k">if</span> <span class="n">read_length</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s">&#39;Ribo-Seq count ({}-mer)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">read_length</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="n">font_xsmall</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c"># rna coverage if available</span>
+    <span class="n">ax_rna</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">rna_counts</span><span class="p">:</span>
+        <span class="n">ax_rna</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+        <span class="n">ax_rna</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">&#39;RNA-Seq count&#39;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="n">font_xsmall</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ax_rna</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">rna_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">rna_counts</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;#e6e6e6&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;#e6e6e6&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;RNA&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">ax_rna</span><span class="o">.</span><span class="n">set_zorder</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">frame_counts</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">{},</span> <span class="mi">2</span><span class="p">:</span> <span class="p">{},</span> <span class="mi">3</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ribo_counts</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">fr</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">fr</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">frame_counts</span><span class="p">[</span><span class="n">fr</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">fr</span><span class="p">]</span>
+                <span class="k">break</span>
+
+    <span class="n">cnts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="p">[</span><span class="n">cnts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">frame_counts</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">y_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">cnts</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">))</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_zorder</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s">&#39;none&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">frame</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;tomato&#39;</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&#39;limegreen&#39;</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&#39;deepskyblue&#39;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">read_offset</span><span class="p">:</span>
+            <span class="n">x_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="o">+</span> <span class="n">read_offset</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">frame_counts</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_vals</span> <span class="o">=</span> <span class="n">frame_counts</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">frame_counts</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">axisbg</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;start codon&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;right&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;#555555&#39;</span><span class="p">,</span>
+             <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;#c6c6c6&#39;</span><span class="p">))</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;stop codon&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s">&quot;right&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">,</span>
+             <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s">&quot;square&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;#777777&#39;</span><span class="p">))</span>
+
+    <span class="n">ax4</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">axisbg</span><span class="o">=</span><span class="s">&#39;#c6c6c6&#39;</span><span class="p">)</span>
+    <span class="n">ax5</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">axisbg</span><span class="o">=</span><span class="s">&#39;#c6c6c6&#39;</span><span class="p">)</span>
+    <span class="n">ax6</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">axisbg</span><span class="o">=</span><span class="s">&#39;#c6c6c6&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax3</span><span class="p">):</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">labeltop</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                         <span class="n">labelleft</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">labelright</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">labelbottom</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">set_axis_color</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="s">&#39;white&#39;</span><span class="p">)</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ax_rna</span><span class="p">:</span>
+        <span class="n">axes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax_rna</span><span class="p">)</span>
+
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">FontProperties</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="s">&#39;5&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+        <span class="n">set_axis_color</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="s">&#39;#f7f7f7&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="n">axis</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span> <span class="o">+</span> <span class="n">axis</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">()):</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">set_fontproperties</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="s">&#39;#555555&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="p">((</span><span class="n">ax4</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">ax5</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">ax6</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+        <span class="n">set_axis_color</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="s">&#39;#C6C6C6&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="n">axis</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()):</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">set_fontproperties</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="s">&#39;#555555&#39;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">transcript_length</span><span class="p">)</span>
+        <span class="n">starts</span> <span class="o">=</span> <span class="p">[(</span><span class="n">item</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">start_stops</span><span class="p">[</span><span class="n">frame</span><span class="p">][</span><span class="s">&#39;starts&#39;</span><span class="p">]]</span>
+        <span class="n">stops</span> <span class="o">=</span> <span class="p">[(</span><span class="n">item</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">start_stops</span><span class="p">[</span><span class="n">frame</span><span class="p">][</span><span class="s">&#39;stops&#39;</span><span class="p">]]</span>
+        <span class="n">start_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;#ffffff&#39;</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">starts</span><span class="p">]</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">broken_barh</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.11</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
+                         <span class="n">facecolors</span><span class="o">=</span><span class="n">start_colors</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="n">start_colors</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;start&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">stop_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;#777777&#39;</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">stops</span><span class="p">]</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">broken_barh</span><span class="p">(</span><span class="n">stops</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span> <span class="n">facecolors</span><span class="o">=</span><span class="n">stop_colors</span><span class="p">,</span>
+                         <span class="n">edgecolors</span><span class="o">=</span><span class="n">stop_colors</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;stop&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frame</span><span class="p">),</span>
+                        <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span> <span class="s">&#39;sans-serif&#39;</span><span class="p">,</span> <span class="s">&#39;color&#39;</span><span class="p">:</span> <span class="s">&#39;#555555&#39;</span><span class="p">,</span>
+                                  <span class="s">&#39;weight&#39;</span><span class="p">:</span> <span class="s">&#39;normal&#39;</span><span class="p">,</span> <span class="s">&#39;size&#39;</span><span class="p">:</span> <span class="s">&#39;6&#39;</span><span class="p">},</span>
+                        <span class="n">rotation</span><span class="o">=</span><span class="s">&#39;horizontal&#39;</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">labeltop</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                         <span class="n">labelleft</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">labelright</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s">&#39;out&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Transcript length ({} nt)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_length</span><span class="p">),</span> <span class="n">fontdict</span><span class="o">=</span><span class="n">font_xsmall</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;Transcript {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_name</span><span class="p">),</span>
+              <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;family&#39;</span><span class="p">:</span> <span class="s">&#39;sans-serif&#39;</span><span class="p">,</span> <span class="s">&#39;color&#39;</span><span class="p">:</span> <span class="s">&#39;#222222&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;weight&#39;</span><span class="p">:</span> <span class="s">&#39;normal&#39;</span><span class="p">,</span> <span class="s">&#39;size&#39;</span><span class="p">:</span> <span class="s">&#39;x-small&#39;</span><span class="p">},</span> <span class="n">y</span><span class="o">=</span><span class="mf">13.0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&#39;riboplot.svg&#39;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&#39;riboplot.png&#39;</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">PKG_DATA_DIR</span><span class="p">,</span> <span class="s">&#39;riboplot.html&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">g</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">html_file</span><span class="p">),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">h</span><span class="p">:</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_name</span><span class="o">=</span><span class="n">transcript_name</span><span class="p">))</span>
+
+    <span class="n">css_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&#39;css&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">css_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">css_dir</span><span class="p">)</span>
+
+    <span class="n">css_data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">PKG_DATA_DIR</span><span class="p">,</span> <span class="s">&#39;css&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">css_data_dir</span><span class="p">):</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">css_data_dir</span><span class="p">,</span> <span class="n">fname</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&#39;css&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="create_parser"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.create_parser">[docs]</a><span class="k">def</span> <span class="nf">create_parser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Argument parser. &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="s">&#39;riboplot.py&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&#39;Plot and output read counts for a single transcript&#39;</span><span class="p">)</span>
+
+    <span class="n">required</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s">&#39;required arguments&#39;</span><span class="p">)</span>
+    <span class="n">required</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-b&#39;</span><span class="p">,</span> <span class="s">&#39;--ribo_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Ribo-Seq alignment file in BAM format&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">required</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="s">&#39;--transcriptome_fasta&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;FASTA format file of the transcriptome&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">required</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-t&#39;</span><span class="p">,</span> <span class="s">&#39;--transcript_name&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Transcript name&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s">&#39;TEXT&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c"># plot function - optional arguments</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-n&#39;</span><span class="p">,</span> <span class="s">&#39;--rna_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;RNA-Seq alignment file (BAM)&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-l&#39;</span><span class="p">,</span> <span class="s">&#39;--read_length&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Read length to consider (default: </span><span class="si">%(default)s</span><span class="s">)&#39;</span><span class="p">,</span>
+                        <span class="n">metavar</span><span class="o">=</span><span class="s">&#39;INTEGER&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-s&#39;</span><span class="p">,</span> <span class="s">&#39;--read_offset&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Read offset (default: </span><span class="si">%(default)s</span><span class="s">)&#39;</span><span class="p">,</span>
+                        <span class="n">metavar</span><span class="o">=</span><span class="s">&#39;INTEGER&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-m&#39;</span><span class="p">,</span> <span class="s">&#39;--html_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Output file for results (HTML)&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;riboplot.html&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-o&#39;</span><span class="p">,</span> <span class="s">&#39;--output_path&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Files are saved in this directory&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;output&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-d&#39;</span><span class="p">,</span> <span class="s">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Flag. Produce debug output&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span>
+
+</div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main program&quot;&quot;&quot;</span>
+    <span class="p">(</span><span class="n">ribo_file</span><span class="p">,</span> <span class="n">rna_file</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">,</span> <span class="n">transcriptome_fasta</span><span class="p">,</span> <span class="n">read_length</span><span class="p">,</span>
+     <span class="n">read_offset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">html_file</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+         <span class="n">args</span><span class="o">.</span><span class="n">ribo_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">rna_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">transcript_name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">transcriptome_fasta</span><span class="p">,</span>
+         <span class="n">args</span><span class="o">.</span><span class="n">read_length</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">read_offset</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">html_file</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Supplied arguments</span><span class="se">\n</span><span class="s">{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;{:&lt;20}: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()])))</span>
+
+    <span class="c"># error messages (simple format) are written to html file</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">html_file</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">ErrorLogFormatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">))</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Checking if required arguments are valid...&#39;</span><span class="p">)</span>
+    <span class="n">ribocore</span><span class="o">.</span><span class="n">check_required_arguments</span><span class="p">(</span><span class="n">ribo_file</span><span class="o">=</span><span class="n">ribo_file</span><span class="p">,</span> <span class="n">transcriptome_fasta</span><span class="o">=</span><span class="n">transcriptome_fasta</span><span class="p">,</span>
+                                      <span class="n">transcript_name</span><span class="o">=</span><span class="n">transcript_name</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Done&#39;</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Checking if optional arguments are valid...&#39;</span><span class="p">)</span>
+    <span class="n">ribocore</span><span class="o">.</span><span class="n">check_optional_arguments</span><span class="p">(</span><span class="n">ribo_file</span><span class="o">=</span><span class="n">ribo_file</span><span class="p">,</span> <span class="n">read_length</span><span class="o">=</span><span class="n">read_length</span><span class="p">,</span> <span class="n">read_offset</span><span class="o">=</span><span class="n">read_offset</span><span class="p">,</span>
+                                      <span class="n">rna_file</span><span class="o">=</span><span class="n">rna_file</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Done&#39;</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Get ribo-seq read counts and total reads in Ribo-Seq...&#39;</span><span class="p">)</span>
+    <span class="n">bam_fileobj</span> <span class="o">=</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">ribo_file</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span>
+    <span class="n">ribo_counts</span><span class="p">,</span> <span class="n">total_reads</span> <span class="o">=</span> <span class="n">ribocore</span><span class="o">.</span><span class="n">get_ribo_counts</span><span class="p">(</span><span class="n">bam_fileobj</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">,</span> <span class="n">read_length</span><span class="p">)</span>
+    <span class="n">bam_fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ribo_counts</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;No RiboSeq read counts for transcript {}. No plot will be &#39;</span>
+               <span class="s">&#39;generated!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_name</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ribocore</span><span class="o">.</span><span class="n">RiboPlotError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Get RNA counts for the given transcript...&#39;</span><span class="p">)</span>
+        <span class="n">mrna_counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">rna_file</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mrna_counts</span> <span class="o">=</span> <span class="n">get_rna_counts</span><span class="p">(</span><span class="n">rna_file</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mrna_counts</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;No RNA counts for this transcript from the given RNA Seq file. &#39;</span>
+                         <span class="s">&#39;RNA-Seq coverage will not be generated&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;No RNA-Seq data provided. Not generating coverage&#39;</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Get sequence and length of the given transcripts from FASTA file...&#39;</span><span class="p">)</span>
+        <span class="n">fasta_records</span> <span class="o">=</span> <span class="n">ribocore</span><span class="o">.</span><span class="n">get_fasta_records</span><span class="p">(</span><span class="n">transcriptome_fasta</span><span class="p">,</span> <span class="p">[</span><span class="n">transcript_name</span><span class="p">])</span>
+        <span class="n">transcript_seq</span><span class="p">,</span> <span class="n">transcript_length</span> <span class="o">=</span> <span class="p">(</span><span class="n">fasta_records</span><span class="p">[</span><span class="n">transcript_name</span><span class="p">][</span><span class="s">&#39;sequence&#39;</span><span class="p">],</span>
+                                             <span class="n">fasta_records</span><span class="p">[</span><span class="n">transcript_name</span><span class="p">][</span><span class="s">&#39;length&#39;</span><span class="p">])</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Get start/stop positions in transcript sequence (3 frames)...&#39;</span><span class="p">)</span>
+        <span class="n">codon_positions</span> <span class="o">=</span> <span class="n">get_start_stops</span><span class="p">(</span><span class="n">transcript_seq</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Writing RiboSeq read counts for {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transcript_name</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&#39;RiboCounts.csv&#39;</span><span class="p">),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;&quot;Position&quot;,&quot;Frame 1&quot;,&quot;Frame 2&quot;,&quot;Frame 3&quot;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">transcript_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">ribo_counts</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;{0},{1},{2},{3}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">pos</span><span class="p">,</span> <span class="n">ribo_counts</span><span class="p">[</span><span class="n">pos</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">ribo_counts</span><span class="p">[</span><span class="n">pos</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">ribo_counts</span><span class="p">[</span><span class="n">pos</span><span class="p">][</span><span class="mi">3</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;{0},{1},{2},{3}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Generating RiboPlot...&#39;</span><span class="p">)</span>
+        <span class="n">plot_profile</span><span class="p">(</span><span class="n">ribo_counts</span><span class="p">,</span> <span class="n">transcript_name</span><span class="p">,</span> <span class="n">transcript_length</span><span class="p">,</span>
+                     <span class="n">codon_positions</span><span class="p">,</span> <span class="n">read_length</span><span class="p">,</span> <span class="n">read_offset</span><span class="p">,</span> <span class="n">mrna_counts</span><span class="p">,</span>
+                     <span class="n">html_file</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">html_file</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Finished!&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../riboplot.html#riboplot.riboplot.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Run program&quot;&quot;&quot;</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">create_parser</span><span class="p">()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../index.html">
+              <img class="logo" src="../../_static/riboplot-logo.png" alt="Logo"/>
+            </a></p><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <!--<h3>Search</h3>-->
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search"/>
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+       <small>
+        Last updated on Aug 26, 2015.
+        </small>
+
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
