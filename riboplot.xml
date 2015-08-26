@@ -1,0 +1,109 @@
+<tool id="riboplot" name="riboplot" version="0.1.0">
+    <description>Plot and output read counts for a single transcript in an alignment (BAM)
+    </description>
+    <requirements>
+        <requirement type="package" version="1.2.1">matplotlib</requirement>
+        <requirement type="package" version="0.8.3">pysam</requirement>
+    </requirements>
+    <stdio>
+        <exit_code range="1:"  level="fatal" description="Error" />
+    </stdio>
+    <command interpreter="python">riboplot/riboplot.py
+    --ribo_file "${ribo_file}"
+    --transcriptome_fasta "${transcriptome_fasta}"
+    --transcript_name "${transcript_name}"
+    #if $rnacov.rnacov_select=="yes"
+        --rna_file "${rna_file}"
+    #end if
+    --read_length "${read_length}"
+    --read_offset "${read_offset}"
+    --html_file "${html_file}"
+    --output_path "${html_file.files_path}"
+    ## --debug
+    </command>
+    <inputs>
+        <param name="ribo_file" type="data" format="bam" label="Ribo-Seq alignment file in BAM format"/>
+        <param name="transcriptome_fasta" type="data" format="fasta" label="FASTA format file of the transcriptome"/>
+        <param name="transcript_name" type="text" label="Name of the transcript to plot (as in FASTA)" size="40">
+            <validator type="expression" message="Please input a single transcript name">len(value.split(',')) == 1</validator>
+            <validator type="empty_field" message="Field requires a value"/>
+            <sanitizer>
+                <valid>
+                    <add value="|"/>
+                </valid>
+            </sanitizer>
+        </param>
+        <conditional name="rnacov">
+            <param name="rnacov_select" type="select" label="Include RNA Coverage">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </param>
+            <when value="yes">
+                <param name="rna_file" type="data" format="bam" label="RNA-Seq alignment file in BAM format"/>
+            </when>
+            <when value="no" />
+        </conditional>
+        <param name="read_length" type="integer" label="Read length to consider" value="28"/>
+        <param name="read_offset" type="integer" label="Offset" value="0"/>
+    </inputs>
+    <outputs>
+        <data format="html" name="html_file" label="riboplot (HTML report)"/>
+    </outputs>
+    <help>
+**RiboPlot**
+
+Plot and output Ribo-Seq read counts of a single transcript from an alignment file (sorted BAM).
+
+----
+
+**Parameters**
+
+1. Ribo-Seq alignment file (Sorted BAM file)
+
+   A Bowtie 1 output (BAM) from an alignment of Ribo-Seq data to the transcriptome. This BAM
+   file should be sorted. This can be done using one of the following methods.
+
+   1. RiboGalaxy -> Sort Data -> Sort BAM dataset.
+   2. ``samtools sort input.bam inputsorted``
+
+2. Transcriptome (FASTA)
+
+   A FASTA format file with sequences of the transcripts.
+
+3. Name of the transcript to plot (Text)
+
+   The name of the transcript to plot **should** match the name in the transcriptome (FASTA)
+   and the Ribo-Seq/RNA-Seq alignment (BAM).
+
+4. RNA coverage [optional] (Sorted BAM file)
+
+   If you have RNA-Seq data (sorted BAM), you can select the option to plot RNA coverage.
+
+5. Read lengths to consider [Optional] (Integer - 0 or greater)
+
+   If this option is provided, only Ribo-Seq data of the given length is considered.
+
+6. Offset [optional] (Integer - 0 or greater)
+
+   If this option is provided, this offset is added to the read alignment positions.
+
+----
+
+**Output**
+
+1. Plots (PNG and SVG)
+
+   Ribo-Seq read counts as a bar plot in 3 frames (color codes: 1: red, 2: green, 3: blue)
+
+   RNA coverage as a gray background (if the RNA coverage option was selected).
+
+   The open reading frame architecture appears below the plot with start (ATG) and stop codons ('TAA', 'TAG', 'TGA') in all 3 frames.
+
+   The color codes are start (white) and stop (dark gray).
+
+   .. image:: images/riboplot.png
+
+2. RiboSeq read counts in 3 frames for each position in the transcript (CSV)
+
+    </help>
+</tool>

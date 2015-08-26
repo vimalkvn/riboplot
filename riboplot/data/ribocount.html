@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>Ribo-Seq profile counts</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <!--<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600"-->
+          <!--rel="stylesheet" type="text/css">-->
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="css/custom.css">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+<body>
+
+<!-- Primary Page Layout
+–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<div class="container">
+    <div class="row">
+        <div class="twelve columns">
+            <h3 id="page-title">Ribo-Seq profile counts for all transcripts</h3>
+            <h5>Total transcript(s) <span class="info">{count}</span>, Footprint
+                length <span class="info">{length}</span></h5>
+            <div id="overlay">Sorting this large table...</div>
+            <table id="counts-table" class="tablesorter u-full-width">
+                <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>Transcript name</th>
+                    <th>Total reads</th>
+                    <th>Counts (csv file)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {table_content}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+</body>
+</html>

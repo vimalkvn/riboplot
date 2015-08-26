@@ -1,0 +1,72 @@
+<tool id="ribocount" name="ribocount" version="0.1.0">
+    <description>Get read counts for all transcripts in an alignment (BAM)
+    </description>
+    <requirements>
+        <requirement type="package" version="0.8.3">pysam</requirement>
+    </requirements>
+    <stdio>
+        <exit_code range="1:"  level="fatal" description="Error" />
+    </stdio>
+    <command interpreter="python">riboplot/ribocount.py
+    --ribo_file "${ribo_file}"
+    --transcriptome_fasta "${transcriptome_fasta}"
+    --read_length "${read_length}"
+    --read_offset "${read_offset}"
+    --html_file "${html_file}"
+    --output_path "${html_file.files_path}"
+    ## --debug
+    </command>
+    <inputs>
+        <param name="ribo_file" type="data" format="bam" label="Ribo-Seq alignment file in BAM format"/>
+        <param name="transcriptome_fasta" type="data" format="fasta" label="FASTA format file of the transcriptome"/>
+        <param name="read_length" type="integer" label="Read length to consider" value="28"/>
+        <param name="read_offset" type="integer" label="Offset" value="0"/>
+    </inputs>
+    <outputs>
+        <data format="html" name="html_file" label="ribocount (HTML report)"/>
+    </outputs>
+    <help>
+**RiboCount**
+
+Output read counts for all transcripts in an alignment.
+
+----
+
+**Parameters**
+
+1. Ribo-Seq alignment file (Sorted BAM file)
+
+   A Bowtie 1 output (BAM) from an alignment of Ribo-Seq data to the transcriptome. This BAM
+   file should be sorted. This can be done using one of the following methods.
+
+   1. RiboGalaxy -> Sort Data -> Sort BAM dataset.
+   2. ``samtools sort input.bam inputsorted``
+
+2. Transcriptome (FASTA)
+
+   A FASTA format file with sequences of the transcripts.
+
+3. Read lengths to consider [optional] (Integer - 0 or greater)
+
+   If this option is provided, only Ribo-Seq data of the given length is considered.
+
+4. Offset [optional] (Integer - 0 or greater)
+
+   If this option is provided, this offset is added to the read alignment positions.
+
+----
+
+**Output**
+
+Read counts for all transcripts in the alignment (ZIP)
+
+The output file ``ribocount_output.zip`` should first be uncompressed. This will generate
+a folder called ``ribocount_output``. Open ``index.html`` in a web browser to view the results of ribocount.
+
+Total reads for each transcript will be displayed in a table along with the name of the transcript and a link
+to the CSV file containing the read counts in 3 frames for each position in the transcript.
+
+.. image:: images/ribocount.png
+
+    </help>
+</tool>

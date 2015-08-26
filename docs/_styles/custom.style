@@ -1,0 +1,33 @@
+  {
+  "fontsAlias" : {
+    "stdFont": "Open Sans :style=Regular",
+    "stdBold": "Open Sans :style=Bold",
+    "stdItalic": "Open Sans :style=Italic",
+    "stdBoldItalic": "Open Sans :style=Bold Italic",
+    "stdMono": "Source Code Pro",
+    "stdMonoItalic": "Source Code Pro",
+    "stdMonoBold": "Source Code Pro",
+    "stdMonoBoldItalic": "Source Code Pro"
+  },
+  "styles": {
+    "base": {
+        "leading": 14
+    },
+    "literal": {
+        "backColor": "#fffce6",
+        "fontSize": 9
+    },
+    "code": {
+        "backColor": "#f9f9f9",
+        "borderColor": "#f1f1f1",
+        "fontSize": 9
+    },
+    "admonition": {
+        "backColor": "#f9f9f9"
+    },
+    "note": {
+        "backColor": "#e6f7ff",
+        "borderColor": "#ccefff"
+    }
+  }
+ }

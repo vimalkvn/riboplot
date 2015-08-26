@@ -1,0 +1,61 @@
+.info {
+    font-weight: normal;
+}
+
+.text-muted {
+    font-size: 0.6em;
+    text-align: center;
+    color: #555555;
+}
+
+#main {
+    text-align: center;
+}
+
+#page-title {
+    margin-top: 5%;
+}
+
+/* tables */
+table.tablesorter {
+    border: 1px solid #eeeeee;
+}
+
+table.tablesorter thead tr .header {
+    background-image: url(bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+
+table.tablesorter thead tr .headerSortUp {
+    background-image: url(asc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown {
+    background-image: url(desc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+    background-color: #eeeeee;
+}
+
+table.tablesorter tbody {
+    font-family: monospace;
+}
+
+#overlay {
+    top: 20px;
+    left: 50%;
+    position: absolute;
+    margin-left: -170px;
+    width: 250px;
+    text-align: center;
+    display: none;
+    margin-top: -10px;
+    background: #F6FF00;
+    color: #515151;
+    padding: 3px;
+    border-radius: 5px;
+    box-shadow: 3px 3px 3px #eeeeee;
+}
