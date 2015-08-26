@@ -19,11 +19,6 @@ Contents:
    authors
    history
 
-API:
-
-.. toctree::
-
-   modules
 
 Indices and tables
 ==================
