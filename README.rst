@@ -19,8 +19,6 @@ There are two programs in the package:
 **ribocount**
     Output read counts for all transcripts in an alignment.
 
-For help on using these programs, please refer to :ref:`usage`.
-
 
 Free software: GPL license.
 
