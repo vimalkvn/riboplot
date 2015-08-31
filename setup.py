@@ -14,7 +14,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
-requirements = ['matplotlib==1.3.1', 'pysam==0.8.3']
+requirements = [item.strip() for item in open('requirements.txt').readlines()]
 
 test_requirements = [
     # TODO: put package test requirements here
@@ -22,7 +22,7 @@ test_requirements = [
 
 setup(
     name='riboplot',
-    version='0.1.0',
+    version='0.1.1',
     description="Plot read counts of RiboSeq data from BAM format alignment files",
     long_description=readme + '\n\n' + history,
     author="Vimalkumar Velayudhan",
