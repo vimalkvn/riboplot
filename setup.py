@@ -14,7 +14,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
-requirements = [item.strip() for item in open('requirements.txt').readlines()]
+requirements = ['mock==1.0.1', 'pysam==0.8.3', 'matplotlib==1.4.3']
 
 test_requirements = [
     # TODO: put package test requirements here
@@ -33,6 +33,7 @@ setup(
     ],
     package_dir={'riboplot':
                  'riboplot'},
+    setup_requires=["numpy"],
     install_requires=requirements,
     license="GPL",
     zip_safe=False,
