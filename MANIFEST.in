@@ -1,2 +1,12 @@
-recursive-exclude * *.py[co]
-exclude riboplot/riboplot_multi.py
+include AUTHORS.rst
+include CONTRIBUTING.rst
+include HISTORY.rst
+include LICENSE
+
+recursive-include images *.png
+recursive-include docs *.rst Makefile make.bat conf.py
+recursive-include docs _static/*
+recursive-include docs _styles/fonts/*.ttf
+recursive-include docs _templates/*.html
+
+include tests/README.rst
