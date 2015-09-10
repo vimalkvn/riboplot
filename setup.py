@@ -14,7 +14,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
-requirements = ['mock==1.0.1', 'pysam==0.8.3', 'matplotlib==1.4.3']
+requirements = ['matplotlib', 'pysam', 'mock==1.0.1']
 
 test_requirements = [
     # TODO: put package test requirements here
@@ -29,7 +29,7 @@ setup(
     author_email='vimalkumarvelayudhan@gmail.com',
     url='https://github.com/vimalkumarvelayudhan/riboplot',
     packages=[
-        'riboplot',
+        'riboplot'
     ],
     package_dir={'riboplot':
                  'riboplot'},
@@ -55,6 +55,5 @@ setup(
             'ribocount = riboplot.ribocount:run']
     },
     package_data={'riboplot': ['data/*.html', 'data/css/*.gif', 'data/css/*.css',
-                               'data/js/*.js', 'data/js/*.map', 'scripts/*.sh']},
-    exclude_package_data={'tests': ['data/*.bam', 'data/*.bai', 'data/*.fna', 'data/*.fai']}
+                               'data/js/*.js', 'data/js/*.map', 'scripts/*.sh']}
 )
