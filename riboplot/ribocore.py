@@ -2,6 +2,7 @@
 import pysam
 import logging
 import subprocess
+from contextlib import contextmanager
 
 
 # create logger for the entire program
@@ -22,6 +23,11 @@ class ArgumentError(Exception):
     pass
 
 
+class BamFileError(Exception):
+    """Errors related to BAM file"""
+    pass
+
+
 class RiboPlotError(Exception):
     """General errors relating to riboplot."""
     pass
@@ -35,6 +41,21 @@ class RiboCountError(Exception):
 class RNACountsError(Exception):
     """For errors related to RNA Coverage generation using bedtools. """
     pass
+
+
+@contextmanager
+def open_pysam_file(fname, ftype):
+    """Open a BAM or FASTA file with pysam (for use with "with" statement)"""
+    try:
+        if ftype == 'bam':
+            fpysam = pysam.AlignmentFile(fname, 'rb')
+        elif ftype == 'fasta':
+            fpysam = pysam.FastaFile(fname)
+        yield fpysam
+    except:
+        raise
+    else:
+        fpysam.close()
 
 
 def is_bam_valid(bam_file):
@@ -97,12 +118,31 @@ def is_fasta_valid(fasta_file):
     return True
 
 
-def get_fasta_record(fasta):
-    """Return a single transcript name from a valid fasta file"""
-    f = pysam.FastaFile(fasta)
-    transcript = f.references[0]
-    f.close()
-    return transcript
+def get_first_transcript_name(fasta_file):
+    """Return the first FASTA sequence from the given FASTA file.
+
+    Keyword arguments:
+    fasta_file -- FASTA format file of the transcriptome
+
+    """
+    with open_pysam_file(fname=fasta_file, ftype='fasta') as f:
+        transcript_name = f.references[0]
+    return transcript_name
+
+
+def get_fasta_record(fasta_file, transcript_name):
+    """Return a single transcript from a valid fasta file as a record.
+
+    record[transcript_name] = sequence
+
+    Keyword arguments:
+    fasta_file -- FASTA format file of the transcriptome
+    transcript_name -- Name of the transcript as in the FASTA header
+
+    """
+    with open_pysam_file(fname=fasta_file, ftype='fasta') as f:
+        sequence = f.fetch(transcript_name)
+    return {transcript_name: sequence}
 
 
 def get_fasta_records(fasta, transcripts):
@@ -126,9 +166,105 @@ def get_fasta_records(fasta, transcripts):
     return records
 
 
+def get_three_frame_orfs(sequence, starts=None, stops=None):
+    """Find ORF's in frames 1, 2 and 3 for the given sequence.
+
+    Positions returned are 1-based (not 0)
+
+    Return format [{'start': start_position, 'stop': stop_position, 'sequence': sequence}, ]
+
+    Keyword arguments:
+    sequence -- sequence for the transcript
+    starts -- List of codons to be considered as start (Default: ['ATG'])
+    stops -- List of codons to be considered as stop (Default: ['TAG', 'TGA', 'TAA'])
+
+    """
+    if not starts:
+        starts = ['ATG']
+
+    if not stops:
+        stops = ['TAG', 'TGA', 'TAA']
+
+    # Find ORFs in 3 frames
+    orfs = []
+    for frame in range(3):
+        start_codon = None
+        orf = ''
+        for position in range(frame, len(sequence), 3):
+            codon = sequence[position:position + 3]
+            if codon in starts:
+                # We have found a start already, so add codon to orf and
+                # continue. This is an internal MET
+                if start_codon is not None:
+                    orf += codon
+                    continue
+
+                # New orf start
+                start_codon = position
+                orf = codon
+            else:
+                # if sequence starts with ATG, start_codon will be 0
+                if start_codon is None:
+                    # We haven't found a start codon yet
+                    continue
+                orf += codon
+                if codon in stops:
+                    # orfs[start_codon + 1] = orf
+                    orfs.append({'start': start_codon + 1, 'stop': position + 3, 'sequence': orf})
+
+                    # Reset
+                    start_codon = None
+                    orf = ''
+    return orfs
+
+
+def get_longest_orf(orfs):
+    """Find longest ORF from the given list of ORFs."""
+    sorted_orf = sorted(orfs, key=lambda x: len(x['sequence']), reverse=True)[0]
+    return sorted_orf
+
+
+def filter_ribo_counts(counts, orf_start=None, orf_stop=None):
+    """Filter read counts  and return only upstream of orf_start or downstream
+    of orf_stop.
+
+    Keyword arguments:
+    counts -- Ribo-Seq read counts obtained from get_ribo_counts.
+    orf_start -- Start position of the longest ORF.
+    orf_stop -- Stop position of the longest ORF.
+
+    """
+    filtered_counts = dict.copy(counts)
+    for position in counts:
+        if orf_start and orf_stop:
+            # if only upstream and downstream reads are required, check if
+            # current position is upstream or downstream of the ORF start/stop
+            # if not, remove from counts
+            if (position > orf_start and position < orf_stop):
+                filtered_counts.pop(position)
+        elif orf_start:
+            # check if current position is upstream of ORF start. if not, remove
+            if position > orf_start:
+                filtered_counts.pop(position)
+        elif orf_stop:
+            # check if current position is downstream of ORF stop. If not,
+            # remove
+            if position < orf_stop:
+                filtered_counts.pop(position)
+
+    # calculate total reads for this transcript
+    total_reads = sum(sum(item.values()) for item in filtered_counts.values())
+    return filtered_counts, total_reads
+
+
 def get_ribo_counts(ribo_fileobj, transcript_name, read_length=0):
-    """Get total reads and read counts in all 3 frames for the give transcript
-    from input BAM file (indexed).
+    """Get read counts in 3 frames for the given transcript from input BAM file
+    (indexed).
+
+    Keyword arguments:
+    ribo_fileobj -- file object - BAM file opened using pysam AlignmentFile
+    transcript_name -- Name of transcript to get counts for
+    read_length (optional) -- If provided, get counts only for reads of this length.
 
     """
     read_counts = {}
@@ -169,6 +305,12 @@ def check_required_arguments(ribo_file, transcriptome_fasta, transcript_name=Non
         log.info('Creating an index for the BAM file...')
         create_bam_index(ribo_file)
 
+        if not bam_has_index(ribo_file):
+            msg = ('Could not create an index for this BAM file. Is this a valid BAM file '
+                   'and/or is the BAM file sorted by chromosomal coordinates?')
+            log.error(msg)
+            raise BamFileError(msg)
+
     # Is FASTA file valid?
     fasta_valid = False
     try:
@@ -187,7 +329,7 @@ def check_required_arguments(ribo_file, transcriptome_fasta, transcript_name=Non
         else:
             # ribocount doesn't have a transcript option so we get the first
             # sequence name from the fasta file
-            transcript_name =  get_fasta_record(transcriptome_fasta)
+            transcript_name = get_first_transcript_name(transcriptome_fasta)
 
         # check if transcript also exists in BAM
         with pysam.AlignmentFile(ribo_file, 'rb') as bam_file:

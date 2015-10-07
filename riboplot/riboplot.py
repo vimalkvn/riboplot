@@ -3,10 +3,6 @@ import sys
 
 # check dependencies
 module_errors = {}
-try:
-    import pysam
-except ImportError as e:
-    module_errors['pysam'] = str(e)
 
 try:
     from matplotlib import pyplot as plt
@@ -25,7 +21,6 @@ if len(module_errors):
 import os
 import re
 import config
-# import timeit
 import shutil
 import logging
 import tempfile
@@ -52,6 +47,7 @@ def get_start_stops(transcript_sequence, start_codons=None, stop_codons=None):
         transcript.
 
         """
+        transcript_sequence = transcript_sequence.upper()  # for comparison with codons below
         if not start_codons:
             start_codons = ['ATG']
         if not stop_codons:
@@ -123,17 +119,18 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     single transcript.
 
     """
+    frame_colors = {1: 'tomato', 2: 'limegreen', 3: 'deepskyblue'}
     gs = gridspec.GridSpec(6, 1, height_ratios=[0.1, 6.8, 0.1, 1, 1, 1], hspace=0.35)
     font_xsmall = {'family': 'sans-serif', 'color': '#555555', 'weight': 'normal', 'size': 'x-small'}
 
     # plot for frames legend
     ax1 = plt.subplot(gs[0], axisbg='white')
     ax1.text(0.95, 0.1, "frame 1", size=6, ha="right", va="center", color='white',
-             bbox=dict(boxstyle="square", color='tomato'))
+             bbox=dict(boxstyle="square", color=frame_colors[1]))
     ax1.text(0.97, 0.1, "2", size=6, ha="right", va="center", color='white',
-             bbox=dict(boxstyle="square", color='limegreen'))
+             bbox=dict(boxstyle="square", color=frame_colors[2]))
     ax1.text(0.99, 0.1, "3", size=6, ha="right", va="center", color='white',
-             bbox=dict(boxstyle="square", color='deepskyblue'))
+             bbox=dict(boxstyle="square", color=frame_colors[3]))
 
     # riboseq bar plots
     ax2 = plt.subplot(gs[1])
@@ -164,7 +161,8 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     ax2.set_zorder(2)
     ax2.patch.set_facecolor('none')
 
-    for frame, color in ((1, 'tomato'), (2, 'limegreen'), (3, 'deepskyblue')):
+    for frame in (1, 2, 3):
+        color = frame_colors[frame]
         if read_offset:
             x_vals = [pos + read_offset for pos in frame_counts[frame].keys()]
         else:
@@ -177,9 +175,9 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     ax3.text(0.99, 0.1, "stop codon", size=6, ha="right", va="center", color='white',
              bbox=dict(boxstyle="square", color='#777777'))
 
-    ax4 = plt.subplot(gs[3], sharex=ax2, axisbg='#c6c6c6')
-    ax5 = plt.subplot(gs[4], sharex=ax2, axisbg='#c6c6c6')
-    ax6 = plt.subplot(gs[5], sharex=ax2, axisbg='#c6c6c6')
+    ax4 = plt.subplot(gs[3], sharex=ax2, axisbg=frame_colors[1])
+    ax5 = plt.subplot(gs[4], sharex=ax2, axisbg=frame_colors[2])
+    ax6 = plt.subplot(gs[5], sharex=ax2, axisbg=frame_colors[3])
 
     for axis in (ax1, ax3):
         axis.tick_params(top=False, left=False, right=False, bottom=False, labeltop=False,
@@ -198,7 +196,7 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
             item.set_color('#555555')
 
     for axis, frame in ((ax4, 1), (ax5, 2), (ax6, 3)):
-        set_axis_color(axis, '#C6C6C6')
+        set_axis_color(axis, frame_colors[frame])
         for item in (axis.get_xticklabels()):
             item.set_fontproperties(fp)
             item.set_color('#555555')
@@ -279,19 +277,24 @@ def main(args):
     log.addHandler(fh)
 
     log.info('Checking if required arguments are valid...')
-    ribocore.check_required_arguments(ribo_file=ribo_file, transcriptome_fasta=transcriptome_fasta,
-                                      transcript_name=transcript_name)
+    ribocore.check_required_arguments(
+        ribo_file=ribo_file, transcriptome_fasta=transcriptome_fasta, transcript_name=transcript_name)
     log.info('Done')
 
     log.info('Checking if optional arguments are valid...')
-    ribocore.check_optional_arguments(ribo_file=ribo_file, read_length=read_length, read_offset=read_offset,
-                                      rna_file=rna_file)
+    ribocore.check_optional_arguments(
+        ribo_file=ribo_file, read_length=read_length, read_offset=read_offset, rna_file=rna_file)
     log.info('Done')
 
+    log.info('Get sequence and length of the given transcript from FASTA file...')
+    record = ribocore.get_fasta_record(transcriptome_fasta, transcript_name)
+    transcript_sequence = record[transcript_name]
+    transcript_length = len(transcript_sequence)
+
     log.info('Get ribo-seq read counts and total reads in Ribo-Seq...')
-    bam_fileobj = pysam.AlignmentFile(ribo_file, 'rb')
-    ribo_counts, total_reads = ribocore.get_ribo_counts(bam_fileobj, transcript_name, read_length)
-    bam_fileobj.close()
+    with ribocore.open_pysam_file(fname=ribo_file, ftype='bam') as bam_fileobj:
+        ribo_counts, total_reads = ribocore.get_ribo_counts(
+            ribo_fileobj=bam_fileobj, transcript_name=transcript_name, read_length=read_length)
 
     if not ribo_counts:
         msg = ('No RiboSeq read counts for transcript {}. No plot will be '
@@ -314,13 +317,8 @@ def main(args):
         else:
             log.debug('No RNA-Seq data provided. Not generating coverage')
 
-        log.info('Get sequence and length of the given transcripts from FASTA file...')
-        fasta_records = ribocore.get_fasta_records(transcriptome_fasta, [transcript_name])
-        transcript_seq, transcript_length = (fasta_records[transcript_name]['sequence'],
-                                             fasta_records[transcript_name]['length'])
-
         log.info('Get start/stop positions in transcript sequence (3 frames)...')
-        codon_positions = get_start_stops(transcript_seq)
+        codon_positions = get_start_stops(transcript_sequence)
 
         if not os.path.exists(output_path):
             os.mkdir(output_path)

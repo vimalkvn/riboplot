@@ -1,5 +1,5 @@
 .info {
-    font-weight: normal;
+    color: #818181;
 }
 
 .text-muted {
@@ -14,6 +14,7 @@
 
 #page-title {
     margin-top: 5%;
+    font-weight: normal;
 }
 
 /* tables */
@@ -26,6 +27,9 @@ table.tablesorter thead tr .header {
     background-repeat: no-repeat;
     background-position: center right;
     cursor: pointer;
+    text-transform: uppercase;
+    font-weight: normal;
+    color: #313131;
 }
 
 table.tablesorter thead tr .headerSortUp {
@@ -42,6 +46,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 
 table.tablesorter tbody {
     font-family: monospace;
+    font-size: 12px;
 }
 
 #overlay {

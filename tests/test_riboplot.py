@@ -24,35 +24,6 @@ class CheckArgumentsTestCase(unittest.TestCase):
         self.assertRaises(OSError, ribocore.check_optional_arguments, ribo_file=args.ribo_file, rna_file=args.rna_file)
         os.environ['PATH'] = save_path
 
-    def test_is_bam_valid(self):
-        """Test if BAM file is valid."""
-        valid = ribocore.is_bam_valid(CFG.RIBO_FILE)
-        self.assertTrue(valid)
-
-        # test with a FASTA file (which is not BAM)
-        self.assertRaises(ValueError, ribocore.is_bam_valid, CFG.TRANSCRIPTOME_FASTA)
-
-    def test_bam_has_index(self):
-        """Check if BAM file has an index."""
-        # RPF file has an index
-        has_index = ribocore.bam_has_index(CFG.RIBO_FILE)
-        self.assertTrue(has_index)
-
-        # RNA file doesn't have an index
-        has_index = ribocore.bam_has_index(CFG.RNA_FILE)
-        self.assertFalse(has_index)
-
-    def test_create_bam_index(self):
-        """Index a BAM file."""
-        ribocore.create_bam_index(CFG.RNA_FILE)
-
-        # check if index exists
-        has_index = ribocore.bam_has_index(CFG.RNA_FILE)
-        self.assertTrue(has_index)
-
-        # remove index
-        os.remove('{}.bai'.format(CFG.RNA_FILE))
-
     def test_valid_read_length(self):
         """Read length should be a valid integer."""
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA,
@@ -77,10 +48,6 @@ class CheckArgumentsTestCase(unittest.TestCase):
                                        '-s', '-1'])  # invalid read offset -1
         self.assertRaises(ribocore.ArgumentError, ribocore.check_optional_arguments,
                           ribo_file=args.ribo_file, read_offset=args.read_offset)
-
-    def test_is_fasta_valid(self):
-        """A valid FASTA file can be opened with pysam.FastaFile."""
-        self.assertTrue(ribocore.is_fasta_valid(CFG.TRANSCRIPTOME_FASTA))
 
     def test_missing_transcript_in_fasta(self):
         """If a transcript is missing in FASTA, an error is raised."""

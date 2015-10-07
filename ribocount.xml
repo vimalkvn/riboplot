@@ -12,6 +12,11 @@
     --transcriptome_fasta "${transcriptome_fasta}"
     --read_length "${read_length}"
     --read_offset "${read_offset}"
+    #if $region_select=="five_prime"
+    --count_five
+    #elif $region_select=="three_prime"
+    --count_three
+    #end if
     --html_file "${html_file}"
     --output_path "${html_file.files_path}"
     ## --debug
@@ -19,11 +24,18 @@
     <inputs>
         <param name="ribo_file" type="data" format="bam" label="Ribo-Seq alignment file in BAM format"/>
         <param name="transcriptome_fasta" type="data" format="fasta" label="FASTA format file of the transcriptome"/>
-        <param name="read_length" type="integer" label="Read length to consider" value="28"/>
+        <param name="read_length" type="integer" label="Read length to consider" value="28" help="If specified, only reads of this length will be considered.
+            A read length of 0 will output counts for all reads"/>
         <param name="read_offset" type="integer" label="Offset" value="0"/>
+        <param name="region_select" type="select" label="Which read counts to output?"
+            help="Output read counts for the entire transcript or restrict read counts to the region 5' or 3' of the longest ORF">
+            <option value="all_reads">All reads</option>
+            <option value="five_prime">5' of the longest ORF</option>
+            <option value="three_prime">3' of the longest ORF</option>
+        </param>
     </inputs>
     <outputs>
-        <data format="html" name="html_file" label="ribocount (HTML report)"/>
+        <data format="html" name="html_file" label="ribocount on ${ribo_file.name} ($region_select.value_label)"/>
     </outputs>
     <help>
 **RiboCount**

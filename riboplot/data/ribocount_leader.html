@@ -36,21 +36,21 @@
 <div class="container">
     <div class="row">
         <div class="twelve columns">
-            <h4 id="page-title">Ribo-Seq profile counts for all transcripts</h4>
+            <h4 id="page-title">Ribo-Seq profile counts for transcripts with reads in the {prime}' leader region</h4>
             <h5><span class="info">Number of transcripts &ndash;</span> {count} <span class="info">Footprint length &ndash;</span> {length}</h5>
-            
             <div id="overlay">Sorting this large table...</div>
             <table id="counts-table" class="tablesorter u-full-width">
-                <thead>
-                <tr>
-                    <th>Transcript name</th>
-                    <th>Total reads</th>
-                    <th>Counts (CSV file)</th>
-                </tr>
-                </thead>
-                <tbody>
+            <thead>
+            <tr>
+                <th>Transcript name</th>
+                <th>Total reads</th>
+                <th>{prime}' leader reads</th>
+                <th>Counts (CSV file)</th>
+            </tr>
+            </thead>
+            <tbody>
                 {table_body}
-                </tbody>
+            </tbody>
             </table>
         </div>
     </div>
