@@ -120,23 +120,17 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
 
     """
     frame_colors = {1: 'tomato', 2: 'limegreen', 3: 'deepskyblue'}
-    gs = gridspec.GridSpec(6, 1, height_ratios=[0.1, 6.8, 0.1, 1, 1, 1], hspace=0.35)
-    font_xsmall = {'family': 'sans-serif', 'color': '#555555', 'weight': 'normal', 'size': 'x-small'}
-
-    # plot for frames legend
-    ax1 = plt.subplot(gs[0], axisbg='white')
-    ax1.text(0.95, 0.1, "frame 1", size=6, ha="right", va="center", color='white',
-             bbox=dict(boxstyle="square", color=frame_colors[1]))
-    ax1.text(0.97, 0.1, "2", size=6, ha="right", va="center", color='white',
-             bbox=dict(boxstyle="square", color=frame_colors[2]))
-    ax1.text(0.99, 0.1, "3", size=6, ha="right", va="center", color='white',
-             bbox=dict(boxstyle="square", color=frame_colors[3]))
+    gs = gridspec.GridSpec(3, 1, height_ratios=[8, 1.3, 0.02], hspace=0.4)
+    font_xsmall = {'family': 'sans-serif', 'color': '#555555', 'weight': 'bold', 'size': 'x-small'}
 
     # riboseq bar plots
-    ax2 = plt.subplot(gs[1])
+    gs2 = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=gs[0])
+    ax2 = plt.subplot(gs2[0])
     label = 'Ribo-Seq count'
+    font_xsmall.update(color='#666666')
     if read_length:
         label = 'Ribo-Seq count ({}-mer)'.format(read_length)
+    ax2.set_xlabel('Transcript length ({} nt)'.format(transcript_length), fontdict=font_xsmall, labelpad=10)
     ax2.set_ylabel(label, fontdict=font_xsmall, labelpad=10)
 
     # rna coverage if available
@@ -169,17 +163,27 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
             x_vals = frame_counts[frame].keys()
         ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color, linewidth=0.5)
 
-    ax3 = plt.subplot(gs[2], axisbg='white')
-    ax3.text(0.90, 0.1, "start codon", size=6, ha="right", va="center", color='#555555',
-             bbox=dict(boxstyle="square", facecolor='white', edgecolor='#c6c6c6'))
-    ax3.text(0.99, 0.1, "stop codon", size=6, ha="right", va="center", color='white',
+    gs3 = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs[1], hspace=0)
+    ax4 = plt.subplot(gs3[0], sharex=ax2, axisbg=frame_colors[1])
+    ax5 = plt.subplot(gs3[1], sharex=ax2, axisbg=frame_colors[2])
+    ax6 = plt.subplot(gs3[2], sharex=ax2, axisbg=frame_colors[3])
+
+    gs4 = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=gs[2], hspace=0)
+    ax3 = plt.subplot(gs4[0], axisbg='white')
+    ax3.text(0.03, 0.1, "Legend", size=6, ha='center', va='center', color='#666666')
+    ax3.text(0.12, 0.1, "START CODON", size=6, ha="center", va="center", color='#666666',
+             bbox=dict(boxstyle="square", facecolor='white', edgecolor='#666666', linewidth=0.3))
+    ax3.text(0.23, 0.1, "STOP CODON", size=6, ha="center", va="center", color='white',
              bbox=dict(boxstyle="square", color='#777777'))
 
-    ax4 = plt.subplot(gs[3], sharex=ax2, axisbg=frame_colors[1])
-    ax5 = plt.subplot(gs[4], sharex=ax2, axisbg=frame_colors[2])
-    ax6 = plt.subplot(gs[5], sharex=ax2, axisbg=frame_colors[3])
+    ax3.text(0.32, 0.1, "FRAME 1", size=6, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=frame_colors[1]))
+    ax3.text(0.39, 0.1, "FRAME 2", size=6, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=frame_colors[2]))
+    ax3.text(0.46, 0.1, "FRAME 3", size=6, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=frame_colors[3]))
 
-    for axis in (ax1, ax3):
+    for axis in (ax3, ax4, ax5):
         axis.tick_params(top=False, left=False, right=False, bottom=False, labeltop=False,
                          labelleft=False, labelright=False, labelbottom=False)
         set_axis_color(axis, 'white')
@@ -216,10 +220,9 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
                         rotation='horizontal', labelpad=10, verticalalignment='center')
         axis.tick_params(top=False, left=False, right=False, labeltop=False,
                          labelleft=False, labelright=False, direction='out')
-    plt.xlabel('Transcript length ({} nt)'.format(transcript_length), fontdict=font_xsmall, labelpad=10)
     plt.title('Transcript {}'.format(transcript_name),
-              fontdict={'family': 'sans-serif', 'color': '#222222',
-                        'weight': 'normal', 'size': 'x-small'}, y=13.0)
+              fontdict={'family': 'sans-serif', 'color': '#444444',
+                        'weight': 'bold', 'size': 'small'}, y=600)
     if not os.path.exists(output_path):
         os.mkdir(output_path)
     plt.savefig(os.path.join(output_path, 'riboplot.svg'))

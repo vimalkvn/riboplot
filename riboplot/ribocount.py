@@ -39,8 +39,8 @@ def create_parser():
                         metavar='INTEGER', type=int, default=0)
 
     count_group = parser.add_mutually_exclusive_group()
-    count_group.add_argument('-v', '--count_five', help='Flag. Output reads in 5\' leader', action='store_true')
-    count_group.add_argument('-r', '--count_three', help='Flag. Output reads in 3\' leader', action='store_true')
+    count_group.add_argument('-v', '--count_five', help='Flag. Output reads in 5\' region', action='store_true')
+    count_group.add_argument('-r', '--count_three', help='Flag. Output reads in 3\' region', action='store_true')
     parser.add_argument('-m', '--html_file', help='Output file for results (HTML)', default='ribocount.html')
     parser.add_argument('-o', '--output_path', help='Files are saved in this directory', default='output')
     parser.add_argument('-d', '--debug', help='Flag. Produce debug output', action='store_true')
@@ -75,10 +75,10 @@ def main(args):
         prime = None
         table_body = ''  # HTML table body content
         if count_five:
-            log.info('Only 5\' leader read counts requested')
+            log.info('Only 5\' read counts requested')
             prime = '5'
         elif count_three:
-            log.info('Only 3\' leader read counts requested')
+            log.info('Only 3\' read counts requested')
             prime = '3'
 
         # create output directories
@@ -102,7 +102,7 @@ def main(args):
                 continue
 
             # By default, all counts will be written (ribo_counts)
-            # If 5' leader or 3' leader counts requested, filter and use
+            # If 5' or 3' counts requested, filter and use
             # those counts for printing instead
             write_counts = ribo_counts
             log.debug('Total read counts {}'.format(ribo_reads))
@@ -123,10 +123,10 @@ def main(args):
 
                 if count_five:
                     write_counts, five_reads = ribocore.filter_ribo_counts(counts=ribo_counts, orf_start=orf_start)
-                    log.debug('5\' leader read counts: {}'.format(five_reads))
+                    log.debug('5\' region read counts: {}'.format(five_reads))
                 elif count_three:
                     write_counts, three_reads = ribocore.filter_ribo_counts(counts=ribo_counts, orf_stop=orf_stop)
-                    log.debug('3\' leader read counts: {}'.format(three_reads))
+                    log.debug('3\' region read counts: {}'.format(three_reads))
 
             if not len(write_counts):
                 # no counts for transcript
@@ -163,7 +163,7 @@ def main(args):
             log.info('No transcripts found')
     else:
         if prime:
-            template = 'ribocount_leader.html'
+            template = 'ribocount_prime.html'
         else:
             template = 'ribocount.html'
         with open(os.path.join(CONFIG.PKG_DATA_DIR, template)) as g,\

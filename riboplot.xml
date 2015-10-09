@@ -1,4 +1,4 @@
-<tool id="riboplot" name="riboplot" version="0.1.0">
+<tool id="riboplot" name="riboplot" version="0.2.0">
     <description>Plot and output read counts for a single transcript in an alignment (BAM)
     </description>
     <requirements>

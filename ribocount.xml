@@ -12,9 +12,9 @@
     --transcriptome_fasta "${transcriptome_fasta}"
     --read_length "${read_length}"
     --read_offset "${read_offset}"
-    #if $region_select=="five_prime"
+    #if (str($region_select) == 'five_prime'):
     --count_five
-    #elif $region_select=="three_prime"
+    #elif (str($region_select) == 'three_prime'):
     --count_three
     #end if
     --html_file "${html_file}"
