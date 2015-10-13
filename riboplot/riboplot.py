@@ -119,7 +119,7 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     single transcript.
 
     """
-    frame_colors = {1: 'tomato', 2: 'limegreen', 3: 'deepskyblue'}
+    frame_colors = {1: '#fc8d62', 2: '#66c2a5', 3: '#8da0cb'}
     gs = gridspec.GridSpec(3, 1, height_ratios=[8, 1.3, 0.02], hspace=0.4)
     font_xsmall = {'family': 'sans-serif', 'color': '#555555', 'weight': 'bold', 'size': 'x-small'}
 

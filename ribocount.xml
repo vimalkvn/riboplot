@@ -1,4 +1,4 @@
-<tool id="ribocount" name="ribocount" version="0.1.0">
+<tool id="ribocount" name="ribocount" version="0.2.0">
     <description>Get read counts for all transcripts in an alignment (BAM)
     </description>
     <requirements>
@@ -65,6 +65,11 @@ Output read counts for all transcripts in an alignment.
 4. Offset [optional] (Integer - 0 or greater)
 
    If this option is provided, this offset is added to the read alignment positions.
+
+5. Restrict read counts
+
+   Choose whether to output read counts for the entire transcript or restrict read counts to the 5' or 3' region of the longest ORF.
+   Default start (ATG) and stop codons ('TAG', 'TGA', 'TAA') are used to identify the longest ORF in 3 frames.
 
 ----
 
