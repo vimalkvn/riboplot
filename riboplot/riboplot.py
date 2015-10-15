@@ -104,41 +104,72 @@ def get_rna_counts(rna_file, transcript_name):
     return rna_counts
 
 
-def set_axis_color(axis, color):
+def set_axis_color(axis, color, alpha=None):
     """Sets the spine color of all sides of an axis (top, right, bottom, left)."""
-    axis.spines['top'].set_color(color)
-    axis.spines['right'].set_color(color)
-    axis.spines['bottom'].set_color(color)
-    axis.spines['left'].set_color(color)
+    for side in ('top', 'right',  'bottom', 'left'):
+        spine = axis.spines[side]
+        spine.set_color(color)
+        if alpha is not None:
+            spine.set_alpha(alpha)
+
+
+def get_color_palette(scheme):
+    """Return colors for a given scheme. Default colors are returned for an item
+    if undefined in scheme.
+
+    """
+    color_schemes = {
+        'default': {
+            'frames': ['tomato', 'limegreen', 'deepskyblue'], 'background': '#f5f5f5',
+            'color': '#616161', 'ticks': '#757575', 'start': '#ffffff', 'stop': '#919191',
+            'rna': '#e0e0e0', 'axis': '#e0e0e0', 'grey': '#bdbdbd'
+        },
+        'colorbrewer': {
+            'frames': ['#fc8d62', '#66c2a5', '#8da0cb']
+        },
+        'rgb': {
+            'frames': ['red', 'green', 'blue']
+        },
+        'greyorfs': {}
+    }
+
+    colors = {}
+    for k, v in color_schemes['default'].items():
+        try:
+            vals = color_schemes[scheme][k]
+        except KeyError:
+            vals = v
+        colors[k] = vals
+    return colors
 
 
 def plot_profile(ribo_counts, transcript_name, transcript_length,
                  start_stops, read_length=None, read_offset=None, rna_counts=None,
-                 html_file='index.html', output_path='output'):
+                 color_scheme='default', html_file='index.html', output_path='output'):
     """Plot read counts (in all 3 frames) and RNA coverage if provided for a
     single transcript.
 
     """
-    frame_colors = {1: '#fc8d62', 2: '#66c2a5', 3: '#8da0cb'}
-    gs = gridspec.GridSpec(3, 1, height_ratios=[8, 1.3, 0.02], hspace=0.4)
-    font_xsmall = {'family': 'sans-serif', 'color': '#555555', 'weight': 'bold', 'size': 'x-small'}
+    colors = get_color_palette(scheme=color_scheme)
+    gs = gridspec.GridSpec(3, 1, height_ratios=[6, 1.3, 0.5], hspace=0.35)
+    font_axis = {'family': 'sans-serif', 'color': colors['color'], 'weight': 'bold', 'size': 7}
 
     # riboseq bar plots
     gs2 = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=gs[0])
     ax2 = plt.subplot(gs2[0])
     label = 'Ribo-Seq count'
-    font_xsmall.update(color='#666666')
+
     if read_length:
         label = 'Ribo-Seq count ({}-mer)'.format(read_length)
-    ax2.set_xlabel('Transcript length ({} nt)'.format(transcript_length), fontdict=font_xsmall, labelpad=10)
-    ax2.set_ylabel(label, fontdict=font_xsmall, labelpad=10)
+    ax2.set_ylabel(label, fontdict=font_axis, labelpad=10)
 
     # rna coverage if available
     ax_rna = None
     if rna_counts:
         ax_rna = ax2.twinx()
-        ax_rna.set_ylabel('RNA-Seq count', fontdict=font_xsmall, labelpad=10)
-        ax_rna.bar(rna_counts.keys(), rna_counts.values(), facecolor='#e6e6e6', edgecolor='#e6e6e6', label='RNA', linewidth=0.5)
+        ax_rna.set_ylabel('RNA-Seq count', fontdict=font_axis, labelpad=10)
+        ax_rna.bar(rna_counts.keys(), rna_counts.values(), facecolor=colors['rna'],
+                   edgecolor=colors['rna'], label='RNA', linewidth=0)
         ax_rna.set_zorder(1)
 
     frame_counts = {1: {}, 2: {}, 3: {}}
@@ -150,43 +181,55 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
 
     cnts = []
     [cnts.extend(item.values()) for item in frame_counts.values()]
-    y_max = int(round(max(cnts) * 1.2))
+    y_max = float(max(cnts) * 1.25)
     ax2.set_ylim(0.0, y_max)
     ax2.set_zorder(2)
     ax2.patch.set_facecolor('none')
 
     for frame in (1, 2, 3):
-        color = frame_colors[frame]
+        color = colors['frames'][frame - 1]
         if read_offset:
             x_vals = [pos + read_offset for pos in frame_counts[frame].keys()]
         else:
             x_vals = frame_counts[frame].keys()
-        ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color, linewidth=0.5)
+        ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color, linewidth=0)
 
-    gs3 = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs[1], hspace=0)
-    ax4 = plt.subplot(gs3[0], sharex=ax2, axisbg=frame_colors[1])
-    ax5 = plt.subplot(gs3[1], sharex=ax2, axisbg=frame_colors[2])
-    ax6 = plt.subplot(gs3[2], sharex=ax2, axisbg=frame_colors[3])
+    # ORF architecture
+    gs3 = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs[1], hspace=0.1)
+    if color_scheme == 'greyorfs':
+        axisbg = [colors['grey'] for i in range(3)]
+    else:
+        axisbg = colors['frames']
 
-    gs4 = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=gs[2], hspace=0)
-    ax3 = plt.subplot(gs4[0], axisbg='white')
-    ax3.text(0.03, 0.1, "Legend", size=6, ha='center', va='center', color='#666666')
-    ax3.text(0.12, 0.1, "START CODON", size=6, ha="center", va="center", color='#666666',
-             bbox=dict(boxstyle="square", facecolor='white', edgecolor='#666666', linewidth=0.3))
-    ax3.text(0.23, 0.1, "STOP CODON", size=6, ha="center", va="center", color='white',
-             bbox=dict(boxstyle="square", color='#777777'))
+    ax4 = plt.subplot(gs3[0], sharex=ax2, axisbg=axisbg[0])
+    ax5 = plt.subplot(gs3[1], sharex=ax2, axisbg=axisbg[1])
+    ax6 = plt.subplot(gs3[2], sharex=ax2, axisbg=axisbg[2])
+    ax6.set_xlabel('Transcript length ({} nt)'.format(transcript_length), fontdict=font_axis, labelpad=6)
 
-    ax3.text(0.32, 0.1, "FRAME 1", size=6, ha="center", va="center", color='white',
-             bbox=dict(boxstyle="square", color=frame_colors[1]))
-    ax3.text(0.39, 0.1, "FRAME 2", size=6, ha="center", va="center", color='white',
-             bbox=dict(boxstyle="square", color=frame_colors[2]))
-    ax3.text(0.46, 0.1, "FRAME 3", size=6, ha="center", va="center", color='white',
-             bbox=dict(boxstyle="square", color=frame_colors[3]))
+    # Legend
+    gs4 = gridspec.GridSpecFromSubplotSpec(1, 1, subplot_spec=gs[2], hspace=0.1)
+    ax7 = plt.subplot(gs4[0], axisbg=colors['background'])
+    set_axis_color(ax7, colors['background'])
 
-    for axis in (ax3, ax4, ax5):
+    ax7.text(0.03, 0.1, "Codons: ", size=5, ha='center', va='center', color=colors['color'],
+             fontdict={'weight': 'bold'})
+    ax7.text(0.10, 0.1, "START", size=5, ha="center", va="center", color=colors['color'],
+             bbox=dict(boxstyle="square", facecolor=colors['start'], edgecolor=colors['color'], linewidth=0.2))
+    ax7.text(0.15, 0.1, "STOP", size=5, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=colors['stop']))
+    ax7.text(0.22, 0.1, "Frames: ", size=5, ha='center', va='center', color=colors['color'],
+             fontdict={'weight': 'bold'})
+    ax7.text(0.27, 0.1, "1", size=5, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=colors['frames'][0]))
+    ax7.text(0.29, 0.1, "2", size=5, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=colors['frames'][1]))
+    ax7.text(0.31, 0.1, "3", size=5, ha="center", va="center", color='white',
+             bbox=dict(boxstyle="square", color=colors['frames'][2]))
+
+    # No ticks or labels for ORF 1, 2 and Legend
+    for axis in (ax4, ax5, ax7):
         axis.tick_params(top=False, left=False, right=False, bottom=False, labeltop=False,
                          labelleft=False, labelright=False, labelbottom=False)
-        set_axis_color(axis, 'white')
 
     axes = [ax2]
     if ax_rna:
@@ -194,39 +237,45 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
 
     fp = FontProperties(size='5')
     for axis in axes:
-        set_axis_color(axis, '#f7f7f7')
+        set_axis_color(axis, colors['axis'])
+        axis.tick_params(colors=colors['ticks'])
         for item in (axis.get_xticklabels() + axis.get_yticklabels()):
             item.set_fontproperties(fp)
-            item.set_color('#555555')
+            item.set_color(colors['color'])
 
     for axis, frame in ((ax4, 1), (ax5, 2), (ax6, 3)):
-        set_axis_color(axis, frame_colors[frame])
+        if color_scheme == 'greyorfs':
+            color = colors['grey']
+        else:
+            color = colors['frames'][frame - 1]
+        set_axis_color(axis, color, alpha=0.05)
+        axis.patch.set_alpha(0.3)  # opacity of ORF architecture
         for item in (axis.get_xticklabels()):
             item.set_fontproperties(fp)
-            item.set_color('#555555')
+            item.set_color(colors['color'])
         axis.set_ylim(0, 0.2)
         axis.set_xlim(0, transcript_length)
         starts = [(item, 1) for item in start_stops[frame]['starts']]
         stops = [(item, 1) for item in start_stops[frame]['stops']]
-        start_colors = ['#ffffff' for item in starts]
+        start_colors = [colors['start'] for item in starts]
         axis.broken_barh(starts, (0.11, 0.2),
-                         facecolors=start_colors, edgecolors=start_colors, label='start', zorder=5, linewidth=0.5)
-        stop_colors = ['#777777' for item in stops]
+                         facecolors=start_colors, edgecolors=start_colors, label='start', zorder=5, linewidth=0)
+        stop_colors = [colors['stop'] for item in stops]
         axis.broken_barh(stops, (0, 0.2), facecolors=stop_colors,
-                         edgecolors=stop_colors, label='stop', zorder=5, linewidth=0.5)
+                         edgecolors=stop_colors, label='stop', zorder=5, linewidth=0)
         axis.set_ylabel('{}'.format(frame),
-                        fontdict={'family': 'sans-serif', 'color': '#555555',
+                        fontdict={'family': 'sans-serif', 'color': colors['color'],
                                   'weight': 'normal', 'size': '6'},
                         rotation='horizontal', labelpad=10, verticalalignment='center')
         axis.tick_params(top=False, left=False, right=False, labeltop=False,
-                         labelleft=False, labelright=False, direction='out')
-    plt.title('Transcript {}'.format(transcript_name),
-              fontdict={'family': 'sans-serif', 'color': '#444444',
-                        'weight': 'bold', 'size': 'small'}, y=600)
+                         labelleft=False, labelright=False, direction='out', colors=colors['ticks'])
+    plt.title('{}'.format(transcript_name),
+              fontdict={'family': 'sans-serif', 'color': colors['color'],
+                        'weight': 'bold', 'size': 8, 'y': 20})
     if not os.path.exists(output_path):
         os.mkdir(output_path)
-    plt.savefig(os.path.join(output_path, 'riboplot.svg'))
-    plt.savefig(os.path.join(output_path, 'riboplot.png'), dpi=300)
+    plt.savefig(os.path.join(output_path, 'riboplot.svg'), facecolor=colors['background'])
+    plt.savefig(os.path.join(output_path, 'riboplot.png'), dpi=600, facecolor=colors['background'])
 
     with open(os.path.join(CONFIG.PKG_DATA_DIR, 'riboplot.html')) as g, open(os.path.join(output_path, html_file), 'w') as h:
         h.write(g.read().format(transcript_name=transcript_name))
@@ -256,6 +305,8 @@ def create_parser():
                         metavar='INTEGER', type=int)
     parser.add_argument('-s', '--read_offset', help='Read offset (default: %(default)s)',
                         metavar='INTEGER', type=int, default=0)
+    parser.add_argument('-c', '--color_scheme', help='Color scheme to use (default: %(default)s)',
+                        choices=['default', 'colorbrewer', 'rgb', 'greyorfs'], default='default')
     parser.add_argument('-m', '--html_file', help='Output file for results (HTML)', default='riboplot.html')
     parser.add_argument('-o', '--output_path', help='Files are saved in this directory', default='output')
     parser.add_argument('-d', '--debug', help='Flag. Produce debug output', action='store_true')
@@ -340,6 +391,7 @@ def main(args):
         log.info('Generating RiboPlot...')
         plot_profile(ribo_counts, transcript_name, transcript_length,
                      codon_positions, read_length, read_offset, mrna_counts,
+                     color_scheme=args.color_scheme,
                      html_file=args.html_file, output_path=args.output_path)
     log.info('Finished!')
 
