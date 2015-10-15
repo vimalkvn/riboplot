@@ -22,5 +22,5 @@ There are two programs in the package:
 
 Free software: GPL license.
 
-Documentation: https://riboplot.readthedocs.org.
+Documentation: http://pythonhosted.org/riboplot.
 

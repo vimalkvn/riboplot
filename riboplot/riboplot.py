@@ -120,7 +120,7 @@ def get_color_palette(scheme):
     """
     color_schemes = {
         'default': {
-            'frames': ['tomato', 'limegreen', 'deepskyblue'], 'background': '#f5f5f5',
+            'frames': ['tomato', 'limegreen', 'deepskyblue'], 'background': '#fafafa',
             'color': '#616161', 'ticks': '#757575', 'start': '#ffffff', 'stop': '#919191',
             'rna': '#e0e0e0', 'axis': '#e0e0e0', 'grey': '#bdbdbd'
         },
