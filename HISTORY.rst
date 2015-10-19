@@ -2,6 +2,10 @@
 
 History
 =======
+0.2.1 (2015-10-16)
+------------------
+Fix: Add mock again to setup requirements. Matplolib install under Galaxy fails otherwise.
+
 0.2.0 (2015-10-15)
 ------------------
 **riboplot**
