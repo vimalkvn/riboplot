@@ -120,9 +120,9 @@ def get_color_palette(scheme):
     """
     color_schemes = {
         'default': {
-            'frames': ['tomato', 'limegreen', 'deepskyblue'], 'background': '#fafafa',
-            'color': '#616161', 'ticks': '#757575', 'start': '#ffffff', 'stop': '#919191',
-            'rna': '#e0e0e0', 'axis': '#e0e0e0', 'grey': '#bdbdbd'
+            'frames': ['tomato', 'limegreen', 'deepskyblue'], 'background': '#ffffff',
+            'color': '#616161', 'ticks': '#757575', 'start': '#ffffff', 'stop': '#909090',
+            'rna': '#eaeaea', 'axis': '#e0e0e0', 'grey': '#bdbdbd'
         },
         'colorbrewer': {
             'frames': ['#fc8d62', '#66c2a5', '#8da0cb']
@@ -169,7 +169,7 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
         ax_rna = ax2.twinx()
         ax_rna.set_ylabel('RNA-Seq count', fontdict=font_axis, labelpad=10)
         ax_rna.bar(rna_counts.keys(), rna_counts.values(), facecolor=colors['rna'],
-                   edgecolor=colors['rna'], label='RNA', linewidth=0)
+                   edgecolor=colors['rna'], label='RNA')
         ax_rna.set_zorder(1)
 
     frame_counts = {1: {}, 2: {}, 3: {}}
@@ -192,7 +192,7 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
             x_vals = [pos + read_offset for pos in frame_counts[frame].keys()]
         else:
             x_vals = frame_counts[frame].keys()
-        ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color, linewidth=0)
+        ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color)
 
     # ORF architecture
     gs3 = gridspec.GridSpecFromSubplotSpec(3, 1, subplot_spec=gs[1], hspace=0.1)
@@ -258,11 +258,11 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
         starts = [(item, 1) for item in start_stops[frame]['starts']]
         stops = [(item, 1) for item in start_stops[frame]['stops']]
         start_colors = [colors['start'] for item in starts]
-        axis.broken_barh(starts, (0.11, 0.2),
-                         facecolors=start_colors, edgecolors=start_colors, label='start', zorder=5, linewidth=0)
+        axis.broken_barh(starts, (0.11, 0.2), facecolors=start_colors,
+                         edgecolors=start_colors, label='start', zorder=5)
         stop_colors = [colors['stop'] for item in stops]
         axis.broken_barh(stops, (0, 0.2), facecolors=stop_colors,
-                         edgecolors=stop_colors, label='stop', zorder=5, linewidth=0)
+                         edgecolors=stop_colors, label='stop', zorder=5)
         axis.set_ylabel('{}'.format(frame),
                         fontdict={'family': 'sans-serif', 'color': colors['color'],
                                   'weight': 'normal', 'size': '6'},
