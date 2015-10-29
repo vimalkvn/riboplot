@@ -2,6 +2,14 @@
 
 History
 =======
+0.2.2 (2015-10-29)
+------------------
+* Use default linewidth (riboplot), Minor changes to default plot style.
+* Use 'Agg' as the default matplotlib backend (prevent $DISPLAY errors).
+* Use smaller images for the help section.
+* Fix typo in HISTORY.rst.
+* Update Github repository URL.
+
 0.2.1 (2015-10-16)
 ------------------
 Fix: Add mock again to setup requirements. Matplolib install under Galaxy fails otherwise.

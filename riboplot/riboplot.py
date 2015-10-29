@@ -5,10 +5,12 @@ import sys
 module_errors = {}
 
 try:
-    from matplotlib import pyplot as plt
+    import matplotlib
 except ImportError as e:
     module_errors['matplotlib'] = str(e)
 else:
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
     from matplotlib import gridspec
     from matplotlib.font_manager import FontProperties
 
