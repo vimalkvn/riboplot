@@ -1,6 +1,6 @@
-===============================
-RiboPlot
-===============================
+=====
+About
+=====
 
 .. image:: https://img.shields.io/travis/vimalkumarvelayudhan/riboplot.svg
         :target: https://travis-ci.org/vimalkumarvelayudhan/riboplot
@@ -13,14 +13,19 @@ RiboPlot includes programs to plot and output Ribo-Seq read counts from an align
 
 There are two programs in the package:
 
-**riboplot**
+:doc:`riboplot`
     Plot and output read counts (csv) for a single transcript.
 
-**ribocount**
+:doc:`ribocount`
     Output read counts for all transcripts in an alignment.
 
 
 Free software: GPL license.
 
 Documentation: http://pythonhosted.org/riboplot.
+
+PyPI: https://pypi.python.org/pypi/riboplot
+
+Github Repository: https://github.com/vimalkvn/riboplot
+
 

@@ -8,7 +8,7 @@ Please follow the steps below depending on how you would like to use it.
 
     1. RNA coverage plot requires `bedtools <https://github.com/arq5x/bedtools2>`_ to be installed.
 
-       This release of riboplot has been tested with bedtools version ``2.17.0`` and ``2.24``.
+       This release of riboplot has been tested with bedtools versions ``2.17.0`` and ``2.24``.
 
        On Ubuntu and derivatives, bedtools can be installed from the repositories using::
 
@@ -24,7 +24,7 @@ At the command line::
 
     $ pip install riboplot
 
-Or, if you have virtualenvwrapper installed::
+Or, if you have virtualenv and virtualenvwrapper installed::
 
     $ mkvirtualenv riboplot
     $ pip install riboplot
@@ -33,7 +33,7 @@ Or, if you have virtualenvwrapper installed::
 
     If you are using easy_install, please use a recent version of setuptools.
 
-    On Ubuntu 12.04, you might need to tell the virtualenv to use setuptools instead of
+    On Ubuntu 12.04, you might need to tell virtualenv to use setuptools instead of
     distribute (default) like this::
 
         mkvirtualenv --setuptools riboplot
