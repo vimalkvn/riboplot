@@ -174,6 +174,7 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
                    edgecolor=colors['rna'], label='RNA')
         ax_rna.set_zorder(1)
 
+#    import pudb;pudb.set_trace();
     frame_counts = {1: {}, 2: {}, 3: {}}
     for k, v in ribo_counts.iteritems():
         for fr in (1, 2, 3):
@@ -190,10 +191,10 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
 
     for frame in (1, 2, 3):
         color = colors['frames'][frame - 1]
-        if read_offset:
-            x_vals = [pos + read_offset for pos in frame_counts[frame].keys()]
-        else:
-            x_vals = frame_counts[frame].keys()
+#        if read_offset:
+#            x_vals = [pos + read_offset for pos in frame_counts[frame].keys()]
+#        else:
+        x_vals = frame_counts[frame].keys()
         ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color)
 
     # ORF architecture
@@ -350,7 +351,8 @@ def main(args):
     log.info('Get ribo-seq read counts and total reads in Ribo-Seq...')
     with ribocore.open_pysam_file(fname=ribo_file, ftype='bam') as bam_fileobj:
         ribo_counts, total_reads = ribocore.get_ribo_counts(
-            ribo_fileobj=bam_fileobj, transcript_name=transcript_name, read_length=read_length)
+            ribo_fileobj=bam_fileobj, transcript_name=transcript_name,
+            read_length=read_length, read_offset=read_offset)
 
     if not ribo_counts:
         msg = ('No RiboSeq read counts for transcript {}. No plot will be '
@@ -381,14 +383,14 @@ def main(args):
 
         log.info('Writing RiboSeq read counts for {}'.format(transcript_name))
         with open(os.path.join(output_path, 'RiboCounts.csv'), 'w') as f:
-            f.write('"Position","Frame 1","Frame 2","Frame 3"\n')
+            f.write('"Position","Sequence","Frame 1","Frame 2","Frame 3"\n')
 
             for pos in range(1, transcript_length + 1):
                 if pos in ribo_counts:
-                    f.write('{0},{1},{2},{3}\n'.format(
-                        pos, ribo_counts[pos][1], ribo_counts[pos][2], ribo_counts[pos][3]))
+                    f.write('{0},{1},{2},{3},{4}\n'.format(
+                        pos, transcript_sequence[pos - 1], ribo_counts[pos][1], ribo_counts[pos][2], ribo_counts[pos][3]))
                 else:
-                    f.write('{0},{1},{2},{3}\n'.format(pos, 0, 0, 0))
+                    f.write('{0},{1},{2},{3},{4}\n'.format(pos, transcript_sequence[pos - 1], 0, 0, 0))
 
         log.info('Generating RiboPlot...')
         plot_profile(ribo_counts, transcript_name, transcript_length,

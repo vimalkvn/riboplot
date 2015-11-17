@@ -257,9 +257,10 @@ def filter_ribo_counts(counts, orf_start=None, orf_stop=None):
     return filtered_counts, total_reads
 
 
-def get_ribo_counts(ribo_fileobj, transcript_name, read_length=0):
-    """Get read counts in 3 frames for the given transcript from input BAM file
-    (indexed).
+def get_ribo_counts(ribo_fileobj, transcript_name, read_length=0, read_offset=0):
+    """For each mapped read of the given transcript in the BAM file
+    (pysam AlignmentFile object), return the position (+1) and the
+    corresponding frame (1, 2 or 3) to which it aligns.
 
     Keyword arguments:
     ribo_fileobj -- file object - BAM file opened using pysam AlignmentFile
@@ -277,11 +278,16 @@ def get_ribo_counts(ribo_fileobj, transcript_name, read_length=0):
         total_reads += 1
         position = record.pos + 1
 
+        # if an offset is specified, increment position by that offset.
+        if read_offset:
+            position += read_offset
+
         try:
             read_counts[position]
         except KeyError:
             read_counts[position] = {1: 0, 2: 0, 3: 0}
 
+        # calculate the frame of the read from position
         rem = position % 3
         if rem == 0:
             read_counts[position][3] += 1
