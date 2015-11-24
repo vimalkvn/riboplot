@@ -2,9 +2,6 @@
 About
 =====
 
-.. image:: https://img.shields.io/travis/vimalkumarvelayudhan/riboplot.svg
-        :target: https://travis-ci.org/vimalkumarvelayudhan/riboplot
-
 .. image:: https://img.shields.io/pypi/v/riboplot.svg
         :target: https://pypi.python.org/pypi/riboplot
 
@@ -24,8 +21,9 @@ Free software: GPL license.
 
 Documentation: http://pythonhosted.org/riboplot.
 
-PyPI: https://pypi.python.org/pypi/riboplot
+PyPI: https://pypi.python.org/pypi/riboplot.
 
-Github Repository: https://github.com/vimalkvn/riboplot
+Github Repository: https://github.com/vimalkvn/riboplot.
 
+Online: http://ribogalaxy.ucc.ie (under RiboSeq Analysis/RiboPlot).
 

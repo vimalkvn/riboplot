@@ -2,6 +2,11 @@
 
 History
 =======
+0.2.3 (2015-11-24)
+------------------
+* Bugfix: Recalculate read frame positions after applying offset.
+* Add sequence to CSV output.
+
 0.2.2 (2015-10-29)
 ------------------
 * Use default linewidth (riboplot), Minor changes to default plot style.
