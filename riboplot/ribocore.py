@@ -244,12 +244,12 @@ def filter_ribo_counts(counts, orf_start=None, orf_stop=None):
                 filtered_counts.pop(position)
         elif orf_start:
             # check if current position is upstream of ORF start. if not, remove
-            if position > orf_start:
+            if position >= orf_start:
                 filtered_counts.pop(position)
         elif orf_stop:
             # check if current position is downstream of ORF stop. If not,
             # remove
-            if position < orf_stop:
+            if position <= orf_stop:
                 filtered_counts.pop(position)
 
     # calculate total reads for this transcript

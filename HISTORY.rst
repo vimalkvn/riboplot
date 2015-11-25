@@ -2,6 +2,12 @@
 
 History
 =======
+0.2.4 (2015-11-25)
+------------------
+* Bugfix: ribocount now returns correct read counts if an offset is provided.
+* Bugfix: Don't include read counts in the longest ORF start or stop positions
+  i.e., only include reads upstream or downstream of the start or stop positions.
+
 0.2.3 (2015-11-24)
 ------------------
 * Bugfix: Recalculate read frame positions after applying offset.

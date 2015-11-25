@@ -174,7 +174,6 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
                    edgecolor=colors['rna'], label='RNA')
         ax_rna.set_zorder(1)
 
-#    import pudb;pudb.set_trace();
     frame_counts = {1: {}, 2: {}, 3: {}}
     for k, v in ribo_counts.iteritems():
         for fr in (1, 2, 3):
@@ -191,9 +190,6 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
 
     for frame in (1, 2, 3):
         color = colors['frames'][frame - 1]
-#        if read_offset:
-#            x_vals = [pos + read_offset for pos in frame_counts[frame].keys()]
-#        else:
         x_vals = frame_counts[frame].keys()
         ax2.bar(x_vals, frame_counts[frame].values(), color=color, facecolor=color, edgecolor=color)
 
@@ -383,7 +379,7 @@ def main(args):
 
         log.info('Writing RiboSeq read counts for {}'.format(transcript_name))
         with open(os.path.join(output_path, 'RiboCounts.csv'), 'w') as f:
-            f.write('"Position","Sequence","Frame 1","Frame 2","Frame 3"\n')
+            f.write('"Position","Nucleotide","Frame 1","Frame 2","Frame 3"\n')
 
             for pos in range(1, transcript_length + 1):
                 if pos in ribo_counts:

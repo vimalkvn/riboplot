@@ -97,10 +97,12 @@ def main(args):
 
         log.info('Get RiboSeq read counts for all transcripts in FASTA')
         for transcript in f.references:
-            ribo_counts, ribo_reads = ribocore.get_ribo_counts(b, transcript, read_length)
+            ribo_counts, ribo_reads = ribocore.get_ribo_counts(ribo_fileobj=b, transcript_name=transcript,
+                                                               read_length=read_length, read_offset=read_offset)
             if not ribo_reads:  # no reads for this transcript. skip.
                 continue
 
+            transcript_sequence = f[transcript]
             # By default, all counts will be written (ribo_counts)
             # If 5' or 3' counts requested, filter and use
             # those counts for printing instead
@@ -113,7 +115,7 @@ def main(args):
             if count_five or count_three:
                 # use default start and stop codons and find ORFs in all 3
                 # frames (+)
-                orfs = ribocore.get_three_frame_orfs(sequence=f[transcript])
+                orfs = ribocore.get_three_frame_orfs(sequence=transcript_sequence)
                 if not len(orfs):
                     log.debug('No ORFs for transcript {0}'.format(transcript))
                     continue
@@ -136,13 +138,14 @@ def main(args):
             count += 1
             csv_file = 'RiboCounts{}.csv'.format(count)
             with open(os.path.join(csv_dir, csv_file), 'w') as cw:
-                cw.write('"Position","Frame 1","Frame 2","Frame 3"\n')
-                for pos in range(1, len(f[transcript]) + 1):
+                cw.write('"Position","Nucleotide","Frame 1","Frame 2","Frame 3"\n')
+                for pos in range(1, len(transcript_sequence) + 1):
+                    nucleotide = transcript_sequence[pos - 1]
                     if pos in write_counts:
-                        cw.write('{0},{1},{2},{3}\n'.format(
-                            pos, write_counts[pos][1], write_counts[pos][2], write_counts[pos][3]))
+                        cw.write('{0},{1},{2},{3},{4}\n'.format(
+                            pos, nucleotide, write_counts[pos][1], write_counts[pos][2], write_counts[pos][3]))
                     else:
-                        cw.write('{0},{1},{2},{3}\n'.format(pos, 0, 0, 0))
+                        cw.write('{0},{1},{2},{3},{4}\n'.format(pos, nucleotide, 0, 0, 0))
             # HTML table
             table_body += '<tr><td>{0}</td><td>{1}</td>'.format(transcript, ribo_reads)
             if count_five:
