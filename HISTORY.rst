@@ -2,6 +2,12 @@
 
 History
 =======
+0.2.5 (2015-11-30)
+------------------
+* Bugfix: Use known versions of libraries as dependencies in setup.py.
+  Otherwise, pip installs latest versions which haven't been tested.
+* Remove Codons label, change START to AUG [riboplot].
+
 0.2.4 (2015-11-25)
 ------------------
 * Bugfix: ribocount now returns correct read counts if an offset is provided.

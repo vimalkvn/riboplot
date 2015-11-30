@@ -9,4 +9,6 @@ recursive-include docs _static/*
 recursive-include docs _styles/fonts/*.ttf
 recursive-include docs _templates/*.html
 
+prune docs/_build
+
 include tests/README.rst
