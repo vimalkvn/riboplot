@@ -210,19 +210,17 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     ax7 = plt.subplot(gs4[0], axisbg=colors['background'])
     set_axis_color(ax7, colors['background'])
 
-    ax7.text(0.03, 0.1, "Codons: ", size=5, ha='center', va='center', color=colors['color'],
-             fontdict={'weight': 'bold'})
-    ax7.text(0.10, 0.1, "START", size=5, ha="center", va="center", color=colors['color'],
-             bbox=dict(boxstyle="square", facecolor=colors['start'], edgecolor=colors['color'], linewidth=0.2))
-    ax7.text(0.15, 0.1, "STOP", size=5, ha="center", va="center", color='white',
+    ax7.text(0.02, 0.1, "AUG", size=5, ha="center", va="center", color=colors['color'],
+             bbox=dict(boxstyle="square", facecolor=colors['start'], edgecolor=colors['color'], linewidth=0.3))
+    ax7.text(0.06, 0.1, "STOP", size=5, ha="center", va="center", color='white',
              bbox=dict(boxstyle="square", color=colors['stop']))
-    ax7.text(0.22, 0.1, "Frames: ", size=5, ha='center', va='center', color=colors['color'],
+    ax7.text(0.13, 0.1, "Frames", size=5, ha='center', va='center', color=colors['color'],
              fontdict={'weight': 'bold'})
-    ax7.text(0.27, 0.1, "1", size=5, ha="center", va="center", color='white',
+    ax7.text(0.17, 0.1, "1", size=5, ha="center", va="center", color='white',
              bbox=dict(boxstyle="square", color=colors['frames'][0]))
-    ax7.text(0.29, 0.1, "2", size=5, ha="center", va="center", color='white',
+    ax7.text(0.19, 0.1, "2", size=5, ha="center", va="center", color='white',
              bbox=dict(boxstyle="square", color=colors['frames'][1]))
-    ax7.text(0.31, 0.1, "3", size=5, ha="center", va="center", color='white',
+    ax7.text(0.21, 0.1, "3", size=5, ha="center", va="center", color='white',
              bbox=dict(boxstyle="square", color=colors['frames'][2]))
 
     # No ticks or labels for ORF 1, 2 and Legend
