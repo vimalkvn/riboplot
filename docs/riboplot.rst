@@ -46,7 +46,7 @@ The open reading frame architecture appears below the plot with start (ATG) and 
 
 The color codes are start (white) and stop (dark gray).
 
-.. image:: ../images/riboplot.png
+.. image:: images/riboplot_default.png
    :width: 80 %
 
 2. RiboSeq read counts (CSV)
@@ -62,7 +62,7 @@ ColorBrewer
 ...........
 Uses a color blind and print friendly color scheme from `ColorBrewer <http://colorbrewer2.org/>`_.
 
-.. image:: ../images/riboplot_colorbrewer.png
+.. image:: images/riboplot_colorbrewer.png
    :width: 80 %
 
 To use this color scheme, use the ``-c colorbrewer`` option with ``riboplot``.
@@ -71,7 +71,7 @@ RGB
 ...
 Uses the default red, blue and green colors.
 
-.. image:: ../images/riboplot_rgb.png
+.. image:: images/riboplot_rgb.png
    :width: 80 %
 
 To use this color scheme, use the ``-c rgb`` option.
@@ -80,7 +80,7 @@ GreyORFs
 ........
 Uses the default color scheme but the ORF architecture is displayed in a grey background.
 
-.. image:: ../images/riboplot_greyorfs.png
+.. image:: images/riboplot_greyorfs.png
    :width: 80 %
 
 To use this color scheme, use the ``-c greyorfs`` option.

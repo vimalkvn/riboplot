@@ -41,7 +41,7 @@ Total reads for each transcript will be displayed in a table along with the name
 to the CSV file containing the read counts in 3 frames for each position in the transcript. If 5' or 3' counts
 are requested, an extra column will be present with reads in these regions.
 
-.. image:: ../images/ribocount.png
+.. image:: images/ribocount.png
 
 Command line
 ------------
