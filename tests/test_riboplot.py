@@ -21,33 +21,42 @@ class CheckArgumentsTestCase(unittest.TestCase):
             ['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME, '-n', CFG.RNA_FILE])
         save_path = os.environ['PATH']
         os.environ['PATH'] = ''
-        self.assertRaises(OSError, ribocore.check_optional_arguments, ribo_file=args.ribo_file, rna_file=args.rna_file)
+        self.assertRaises(OSError, ribocore.check_rna_file, rna_file=args.rna_file)
         os.environ['PATH'] = save_path
 
     def test_valid_read_length(self):
         """Read length should be a valid integer."""
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA,
                                        '-t', CFG.TRANSCRIPT_NAME, '-l', '28'])
-        ribocore.check_optional_arguments(ribo_file=args.ribo_file, read_length=args.read_length)
+        ribocore.check_read_lengths(ribo_file=args.ribo_file, read_lengths=args.read_lengths)
 
     def test_invalid_read_length(self):
         """An error is raised if an invalid read length is used."""
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
                                        '-l', '-1'])  # invalid read length -1
-        self.assertRaises(ribocore.ArgumentError, ribocore.check_optional_arguments,
-                          ribo_file=args.ribo_file, read_length=args.read_length)
+        self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths,
+                          ribo_file=args.ribo_file, read_lengths=args.read_lengths)
 
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
                                        '-l', '100'])  # invalid read length 100
-        self.assertRaises(ribocore.ArgumentError, ribocore.check_optional_arguments,
-                          ribo_file=args.ribo_file, read_length=args.read_length)
+        self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths,
+                          ribo_file=args.ribo_file, read_lengths=args.read_lengths)
 
     def test_valid_read_offset(self):
         """Read offset should be positive."""
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
                                        '-s', '-1'])  # invalid read offset -1
-        self.assertRaises(ribocore.ArgumentError, ribocore.check_optional_arguments,
-                          ribo_file=args.ribo_file, read_offset=args.read_offset)
+        self.assertRaises(ribocore.ArgumentError, ribocore.check_read_offsets, read_offsets=args.read_offsets)
+
+    def test_read_lengths_offsets(self):
+        """If multiple read lengths, offsets given check if they are valid
+        i.e., Each read length must have a corresponding offset.
+
+        """
+        args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
+                                       '-l', '28,29', '-s', '15,16'])
+        not self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths_offsets,
+                              ribo_file=args.ribo_file, read_lengths=args.read_lengths, read_offsets=args.read_offsets)
 
     def test_missing_transcript_in_fasta(self):
         """If a transcript is missing in FASTA, an error is raised."""

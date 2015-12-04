@@ -94,3 +94,12 @@ class RiboCoreTestCase(unittest.TestCase):
         # longest ORF in reference is sequence with start 529
         longest_orf = ribocore.get_longest_orf(REFERENCE_ORFS)
         self.assertEqual(longest_orf['start'], 529)
+
+    def test_read_lengths_offsets(self):
+        """If multiple read lengths, offsets given check if they are valid
+        i.e., Each read length must have a corresponding offset.
+
+        """
+
+
+

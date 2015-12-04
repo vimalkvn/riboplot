@@ -36,6 +36,11 @@ CONFIG = config.ProductionConfig()
 # create logger
 log = logging.getLogger('riboplot')
 
+if len(log.handlers):
+    # remove the stream handler
+    print log.handlers
+    log.handlers.pop()
+
 
 class ErrorLogFormatter(logging.Formatter):
     """Custom error log format for the HTML file"""
@@ -285,6 +290,14 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     for fname in os.listdir(css_data_dir):
         shutil.copy(os.path.join(css_data_dir, fname), os.path.join(output_path, 'css', fname))
 
+def multiple_values(value):
+    """Split the given comma separated value to multiple values. """
+    values = []
+    for item in value.split(','):
+        item = int(item)
+        values.append(item)
+    return values
+
 
 def create_parser():
     """Argument parser. """
@@ -298,10 +311,10 @@ def create_parser():
 
     # plot function - optional arguments
     parser.add_argument('-n', '--rna_file', help='RNA-Seq alignment file (BAM)')
-    parser.add_argument('-l', '--read_length', help='Read length to consider (default: %(default)s)',
-                        metavar='INTEGER', type=int)
-    parser.add_argument('-s', '--read_offset', help='Read offset (default: %(default)s)',
-                        metavar='INTEGER', type=int, default=0)
+    parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s)',
+                        metavar='Comma separated list of integers', default='0', type=multiple_values)
+    parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s)',
+                        metavar='Comma separated list of integers', default='0', type=multiple_values)
     parser.add_argument('-c', '--color_scheme', help='Color scheme to use (default: %(default)s)',
                         choices=['default', 'colorbrewer', 'rgb', 'greyorfs'], default='default')
     parser.add_argument('-m', '--html_file', help='Output file for results (HTML)', default='riboplot.html')
@@ -313,13 +326,10 @@ def create_parser():
 
 def main(args):
     """Main program"""
-    (ribo_file, rna_file, transcript_name, transcriptome_fasta, read_length,
-     read_offset, output_path, html_file) = (
+    (ribo_file, rna_file, transcript_name, transcriptome_fasta, read_lengths,
+     read_offsets, output_path, html_file) = (
          args.ribo_file, args.rna_file, args.transcript_name, args.transcriptome_fasta,
-         args.read_length, args.read_offset, args.output_path, args.html_file)
-
-    log.debug('Supplied arguments\n{}'.format(
-        '\n'.join(['{:<20}: {}'.format(k, v) for k, v in vars(args).items()])))
+         args.read_lengths, args.read_offsets, args.output_path, args.html_file)
 
     # error messages (simple format) are written to html file
     fh = logging.FileHandler(html_file)
@@ -327,14 +337,29 @@ def main(args):
     fh.setFormatter(ErrorLogFormatter('%(message)s'))
     log.addHandler(fh)
 
+    ch = logging.StreamHandler()
+    if args.debug:
+        ch.setLevel(logging.DEBUG)
+    else:
+        ch.setLevel(logging.INFO)
+    log.addHandler(ch)
+
+    log.debug('Supplied arguments\n{}'.format(
+        '\n'.join(['{:<20}: {}'.format(k, v) for k, v in vars(args).items()])))
+    log.debug('Testing debugggg')
     log.info('Checking if required arguments are valid...')
     ribocore.check_required_arguments(
         ribo_file=ribo_file, transcriptome_fasta=transcriptome_fasta, transcript_name=transcript_name)
     log.info('Done')
 
-    log.info('Checking if optional arguments are valid...')
-    ribocore.check_optional_arguments(
-        ribo_file=ribo_file, read_length=read_length, read_offset=read_offset, rna_file=rna_file)
+    if rna_file:
+        log.info('Checking if RNA-Seq file is valid...')
+        ribocore.check_rna_file(rna_file=rna_file)
+        log.info('Done')
+
+    log.info('Checking read lengths and offsets...')
+    ribocore.check_read_lengths_offsets(
+        ribo_file=ribo_file, read_lengths=read_lengths, read_offsets=read_offsets)
     log.info('Done')
 
     log.info('Get sequence and length of the given transcript from FASTA file...')
@@ -346,7 +371,7 @@ def main(args):
     with ribocore.open_pysam_file(fname=ribo_file, ftype='bam') as bam_fileobj:
         ribo_counts, total_reads = ribocore.get_ribo_counts(
             ribo_fileobj=bam_fileobj, transcript_name=transcript_name,
-            read_length=read_length, read_offset=read_offset)
+            read_lengths=read_lengths, read_offsets=read_offsets)
 
     if not ribo_counts:
         msg = ('No RiboSeq read counts for transcript {}. No plot will be '
@@ -388,7 +413,7 @@ def main(args):
 
         log.info('Generating RiboPlot...')
         plot_profile(ribo_counts, transcript_name, transcript_length,
-                     codon_positions, read_length, read_offset, mrna_counts,
+                     codon_positions, read_lengths, read_offsets, mrna_counts,
                      color_scheme=args.color_scheme,
                      html_file=args.html_file, output_path=args.output_path)
     log.info('Finished!')
