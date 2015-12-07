@@ -151,7 +151,7 @@ def get_color_palette(scheme):
 
 
 def plot_profile(ribo_counts, transcript_name, transcript_length,
-                 start_stops, read_length=None, read_offset=None, rna_counts=None,
+                 start_stops, read_lengths=None, read_offsets=None, rna_counts=None,
                  color_scheme='default', html_file='index.html', output_path='output'):
     """Plot read counts (in all 3 frames) and RNA coverage if provided for a
     single transcript.
@@ -166,8 +166,12 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     ax2 = plt.subplot(gs2[0])
     label = 'Ribo-Seq count'
 
-    if read_length:
-        label = 'Ribo-Seq count ({}-mer)'.format(read_length)
+    if read_lengths:
+        if len(read_lengths) > 1:
+            label = 'Ribo-Seq count ({}-mers)'.format(', '.join('{}'.format(item) for item in read_lengths))
+        else:
+            label = 'Ribo-Seq count ({}-mer)'.format('{}'.format(read_lengths[0]))
+
     ax2.set_ylabel(label, fontdict=font_axis, labelpad=10)
 
     # rna coverage if available
@@ -290,8 +294,8 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     for fname in os.listdir(css_data_dir):
         shutil.copy(os.path.join(css_data_dir, fname), os.path.join(output_path, 'css', fname))
 
-def multiple_values(value):
-    """Split the given comma separated value to multiple values. """
+def lengths_offsets(value):
+    """Split the given comma separated value to multiple integer values. """
     values = []
     for item in value.split(','):
         item = int(item)
@@ -312,9 +316,9 @@ def create_parser():
     # plot function - optional arguments
     parser.add_argument('-n', '--rna_file', help='RNA-Seq alignment file (BAM)')
     parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=multiple_values)
+                        metavar='Comma separated list of integers', default='0', type=lengths_offsets)
     parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=multiple_values)
+                        metavar='Comma separated list of integers', default='0', type=lengths_offsets)
     parser.add_argument('-c', '--color_scheme', help='Color scheme to use (default: %(default)s)',
                         choices=['default', 'colorbrewer', 'rgb', 'greyorfs'], default='default')
     parser.add_argument('-m', '--html_file', help='Output file for results (HTML)', default='riboplot.html')
@@ -357,9 +361,16 @@ def main(args):
         ribocore.check_rna_file(rna_file=rna_file)
         log.info('Done')
 
-    log.info('Checking read lengths and offsets...')
-    ribocore.check_read_lengths_offsets(
-        ribo_file=ribo_file, read_lengths=read_lengths, read_offsets=read_offsets)
+    log.info('Checking read lengths...')
+    ribocore.check_read_lengths(ribo_file=ribo_file, read_lengths=read_lengths)
+    log.info('Done')
+
+    log.info('Checking read offsets...')
+    ribocore.check_read_offsets(read_offsets=read_offsets)
+    log.info('Done')
+
+    log.info('Checking if each read length has a corresponding offset')
+    ribocore.check_read_lengths_offsets(read_lengths=read_lengths, read_offsets=read_offsets)
     log.info('Done')
 
     log.info('Get sequence and length of the given transcript from FASTA file...')

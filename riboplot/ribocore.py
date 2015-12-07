@@ -257,7 +257,7 @@ def filter_ribo_counts(counts, orf_start=None, orf_stop=None):
     return filtered_counts, total_reads
 
 
-def get_ribo_counts(ribo_fileobj, transcript_name, read_length=0, read_offset=0):
+def get_ribo_counts(ribo_fileobj, transcript_name, read_lengths, read_offsets):
     """For each mapped read of the given transcript in the BAM file
     (pysam AlignmentFile object), return the position (+1) and the
     corresponding frame (1, 2 or 3) to which it aligns.
@@ -268,32 +268,32 @@ def get_ribo_counts(ribo_fileobj, transcript_name, read_length=0, read_offset=0)
     read_length (optional) -- If provided, get counts only for reads of this length.
 
     """
+    import pudb; pudb.set_trace()
     read_counts = {}
     total_reads = 0
-
     for record in ribo_fileobj.fetch(transcript_name):
-        if read_length:
-            if record.query_length != read_length:
+        for read_length in read_lengths:
+            if read_length > 0 and read_length != record.query_length:
                 continue
-        total_reads += 1
-        position = record.pos + 1
+            total_reads += 1
+            position = record.pos + 1
 
-        # if an offset is specified, increment position by that offset.
-        if read_offset:
-            position += read_offset
+            # if an offset is specified, increment position by that offset.
+            position += read_offsets[read_lengths.index(read_length)]
 
-        try:
-            read_counts[position]
-        except KeyError:
-            read_counts[position] = {1: 0, 2: 0, 3: 0}
+            try:
+                read_counts[position]
+            except KeyError:
+                read_counts[position] = {1: 0, 2: 0, 3: 0}
 
-        # calculate the frame of the read from position
-        rem = position % 3
-        if rem == 0:
-            read_counts[position][3] += 1
-        else:
-            read_counts[position][rem] += 1
-
+            # calculate the frame of the read from position
+            rem = position % 3
+            if rem == 0:
+                read_counts[position][3] += 1
+            else:
+                read_counts[position][rem] += 1
+    log.debug('Total read counts: {}'.format(total_reads))
+    log.debug('RiboSeq read counts for transcript: {0}\n{1}'.format(transcript_name, read_counts))
     return read_counts, total_reads
 
 
@@ -369,8 +369,7 @@ def check_read_lengths(ribo_file, read_lengths):
             msg = 'Read length must be a positive value'
             log.error(msg)
             raise ArgumentError(msg)
-
-        if read_length not in bam_read_lengths:
+        elif (read_length > 0) and (read_length not in bam_read_lengths):
             msg = 'Reads of the length "{}" does not exist in the BAM file'.format(read_length)
             log.error(msg)
             raise ArgumentError(msg)
@@ -383,3 +382,11 @@ def check_read_offsets(read_offsets):
             msg = 'Read offset must be 0 or greater'
             log.error(msg)
             raise ArgumentError(msg)
+
+
+def check_read_lengths_offsets(read_lengths, read_offsets):
+    """Check if read length has corresponding read offset for all read lengths. """
+    if not len(read_lengths) == len(read_offsets):
+        raise ArgumentError('Each read length should have a corresponding offset value')
+    else:
+        return True

@@ -42,21 +42,34 @@ class CheckArgumentsTestCase(unittest.TestCase):
         self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths,
                           ribo_file=args.ribo_file, read_lengths=args.read_lengths)
 
-    def test_valid_read_offset(self):
+    def test_invalid_read_offset(self):
         """Read offset should be positive."""
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
                                        '-s', '-1'])  # invalid read offset -1
         self.assertRaises(ribocore.ArgumentError, ribocore.check_read_offsets, read_offsets=args.read_offsets)
 
-    def test_read_lengths_offsets(self):
+    def test_valid_read_lengths_offsets(self):
         """If multiple read lengths, offsets given check if they are valid
         i.e., Each read length must have a corresponding offset.
 
         """
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
                                        '-l', '28,29', '-s', '15,16'])
-        not self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths_offsets,
-                              ribo_file=args.ribo_file, read_lengths=args.read_lengths, read_offsets=args.read_offsets)
+        ribocore.check_read_lengths_offsets(read_lengths=args.read_lengths, read_offsets=args.read_offsets)
+
+    def test_invalid_read_lengths_offsets(self):
+        """If multiple read lengths and offsets are given check if they are valid
+        i.e., Each read length must have a corresponding offset and vice-versa. If not, raise
+        an error
+
+        """
+        args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
+                                       '-l', '28,29', '-s', '15'])
+        self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths_offsets, read_lengths=args.read_lengths, read_offsets=args.read_offsets)
+
+        args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
+                                       '-l', '28', '-s', '15,16'])
+        self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths_offsets, read_lengths=args.read_lengths, read_offsets=args.read_offsets)
 
     def test_missing_transcript_in_fasta(self):
         """If a transcript is missing in FASTA, an error is raised."""
@@ -86,7 +99,7 @@ class RNACountsTestCase(unittest.TestCase):
         # using transcriptome FASTA file as the invalid RNA file for test
         parser = riboplot.create_parser()
         args = parser.parse_args(['-b', CFG.RIBO_FILE,  '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME, '-n', CFG.TRANSCRIPTOME_FASTA])
-        self.assertRaises(ValueError, ribocore.check_optional_arguments, ribo_file=args.ribo_file, rna_file=args.rna_file)
+        self.assertRaises(ValueError, ribocore.check_rna_file, rna_file=args.rna_file)
 
 
 class RiboPlotTestCase(unittest.TestCase):
