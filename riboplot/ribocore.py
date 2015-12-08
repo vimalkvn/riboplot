@@ -272,15 +272,17 @@ def get_ribo_counts(ribo_fileobj, transcript_name, read_lengths, read_offsets):
     read_counts = {}
     total_reads = 0
     for record in ribo_fileobj.fetch(transcript_name):
-        for read_length in read_lengths:
-            if read_length > 0 and read_length != record.query_length:
+        query_length = record.query_length
+        position_ref = record.pos + 1
+        for index, read_length in enumerate(read_lengths):
+            position = position_ref  # reset position
+            if read_length == 0 or read_length == query_length:
+                # if an offset is specified, increment position by that offset.
+                position += read_offsets[index]
+            else:
+                # ignore other reads/lengths
                 continue
             total_reads += 1
-            position = record.pos + 1
-
-            # if an offset is specified, increment position by that offset.
-            position += read_offsets[read_lengths.index(read_length)]
-
             try:
                 read_counts[position]
             except KeyError:
@@ -292,6 +294,7 @@ def get_ribo_counts(ribo_fileobj, transcript_name, read_lengths, read_offsets):
                 read_counts[position][3] += 1
             else:
                 read_counts[position][rem] += 1
+
     log.debug('Total read counts: {}'.format(total_reads))
     log.debug('RiboSeq read counts for transcript: {0}\n{1}'.format(transcript_name, read_counts))
     return read_counts, total_reads
@@ -363,13 +366,19 @@ def check_rna_file(rna_file):
 
 def check_read_lengths(ribo_file, read_lengths):
     """Check if read lengths are valid (positive, reads of the length exist in bam). """
+    # check if there are any valid read lengths to check i.e., not equal to 0
+    valid_lengths = list(set(read_lengths))
+    # if read length is 0, all read lengths are requested so we skip the check
+    # for a particular read length
+    if len(valid_lengths) == 1 and valid_lengths[0] == 0:
+        return
     bam_read_lengths = get_bam_read_lengths(ribo_file)
-    for read_length in read_lengths:
+    for read_length in valid_lengths:
         if read_length < 0:
             msg = 'Read length must be a positive value'
             log.error(msg)
             raise ArgumentError(msg)
-        elif (read_length > 0) and (read_length not in bam_read_lengths):
+        if read_length not in bam_read_lengths:
             msg = 'Reads of the length "{}" does not exist in the BAM file'.format(read_length)
             log.error(msg)
             raise ArgumentError(msg)
