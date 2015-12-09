@@ -2,6 +2,12 @@
 
 History
 =======
+0.3 
+---
+* Support for multiple read lengths and corresponding offsets.
+* Optional arguments check is now split into multiple steps.
+* Remove the calculation of read lengths present in the BAM alignment. 
+
 0.2.5 (2015-11-30)
 ------------------
 * Bugfix: Use known versions of libraries as dependencies in setup.py.

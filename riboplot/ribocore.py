@@ -43,6 +43,15 @@ class RNACountsError(Exception):
     pass
 
 
+def lengths_offsets(value):
+    """Split the given comma separated value to multiple integer values. """
+    values = []
+    for item in value.split(','):
+        item = int(item)
+        values.append(item)
+    return values
+
+
 @contextmanager
 def open_pysam_file(fname, ftype):
     """Open a BAM or FASTA file with pysam (for use with "with" statement)"""
@@ -93,15 +102,6 @@ def bam_has_index(bam_file):
 def create_bam_index(bam_file):
     """Create an index for the given BAM file."""
     pysam.index(bam_file)
-
-
-def get_bam_read_lengths(bam_file):
-    """For a given BAM file, return an unique list of read lengths present."""
-    read_lengths = []
-    with pysam.AlignmentFile(bam_file, 'rb') as bam_fileobj:
-        for record in bam_fileobj:
-            read_lengths.append(record.query_length)
-    return set(read_lengths)
 
 
 def is_fasta_valid(fasta_file):
@@ -268,7 +268,6 @@ def get_ribo_counts(ribo_fileobj, transcript_name, read_lengths, read_offsets):
     read_length (optional) -- If provided, get counts only for reads of this length.
 
     """
-    import pudb; pudb.set_trace()
     read_counts = {}
     total_reads = 0
     for record in ribo_fileobj.fetch(transcript_name):
@@ -365,21 +364,16 @@ def check_rna_file(rna_file):
 
 
 def check_read_lengths(ribo_file, read_lengths):
-    """Check if read lengths are valid (positive, reads of the length exist in bam). """
+    """Check if read lengths are valid (positive). """
     # check if there are any valid read lengths to check i.e., not equal to 0
     valid_lengths = list(set(read_lengths))
-    # if read length is 0, all read lengths are requested so we skip the check
-    # for a particular read length
+    # if read length is 0, all read lengths are requested so we skip further
+    # checks.
     if len(valid_lengths) == 1 and valid_lengths[0] == 0:
         return
-    bam_read_lengths = get_bam_read_lengths(ribo_file)
     for read_length in valid_lengths:
         if read_length < 0:
             msg = 'Read length must be a positive value'
-            log.error(msg)
-            raise ArgumentError(msg)
-        if read_length not in bam_read_lengths:
-            msg = 'Reads of the length "{}" does not exist in the BAM file'.format(read_length)
             log.error(msg)
             raise ArgumentError(msg)
 

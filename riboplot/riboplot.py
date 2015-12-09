@@ -294,14 +294,6 @@ def plot_profile(ribo_counts, transcript_name, transcript_length,
     for fname in os.listdir(css_data_dir):
         shutil.copy(os.path.join(css_data_dir, fname), os.path.join(output_path, 'css', fname))
 
-def lengths_offsets(value):
-    """Split the given comma separated value to multiple integer values. """
-    values = []
-    for item in value.split(','):
-        item = int(item)
-        values.append(item)
-    return values
-
 
 def create_parser():
     """Argument parser. """
@@ -316,9 +308,9 @@ def create_parser():
     # plot function - optional arguments
     parser.add_argument('-n', '--rna_file', help='RNA-Seq alignment file (BAM)')
     parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=lengths_offsets)
+                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
     parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=lengths_offsets)
+                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
     parser.add_argument('-c', '--color_scheme', help='Color scheme to use (default: %(default)s)',
                         choices=['default', 'colorbrewer', 'rgb', 'greyorfs'], default='default')
     parser.add_argument('-m', '--html_file', help='Output file for results (HTML)', default='riboplot.html')

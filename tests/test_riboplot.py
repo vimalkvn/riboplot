@@ -39,8 +39,7 @@ class CheckArgumentsTestCase(unittest.TestCase):
 
         args = self.parser.parse_args(['-b', CFG.RIBO_FILE, '-f', CFG.TRANSCRIPTOME_FASTA, '-t', CFG.TRANSCRIPT_NAME,
                                        '-l', '100'])  # invalid read length 100
-        self.assertRaises(ribocore.ArgumentError, ribocore.check_read_lengths,
-                          ribo_file=args.ribo_file, read_lengths=args.read_lengths)
+        self.assertRaises(ribocore.RiboPlotError, riboplot.main, args=args)
 
     def test_invalid_read_offset(self):
         """Read offset should be positive."""

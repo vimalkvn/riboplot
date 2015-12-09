@@ -33,10 +33,10 @@ def create_parser():
     required.add_argument('-f', '--transcriptome_fasta', help='FASTA format file of the transcriptome', required=True)
 
     # optional arguments
-    parser.add_argument('-l', '--read_length', help='Read length to consider (default: %(default)s)',
-                        metavar='INTEGER', type=int)
-    parser.add_argument('-s', '--read_offset', help='Read offset (default: %(default)s)',
-                        metavar='INTEGER', type=int, default=0)
+    parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s)',
+                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
+    parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s)',
+                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
 
     count_group = parser.add_mutually_exclusive_group()
     count_group.add_argument('-v', '--count_five', help='Flag. Output reads in 5\' region', action='store_true')
@@ -50,9 +50,9 @@ def create_parser():
 
 def main(args):
     """Main program"""
-    (ribo_file, transcriptome_fasta, read_length, read_offset, count_five, count_three,
+    (ribo_file, transcriptome_fasta, read_lengths, read_offsets, count_five, count_three,
      output_path, html_file) = \
-        (args.ribo_file, args.transcriptome_fasta, args.read_length, args.read_offset,
+        (args.ribo_file, args.transcriptome_fasta, args.read_lengths, args.read_offsets,
          args.count_five, args.count_three, args.output_path, args.html_file)
 
     log.debug('Supplied arguments\n{}'.format(
@@ -64,9 +64,19 @@ def main(args):
     fh.setFormatter(ErrorLogFormatter('%(message)s'))
     log.addHandler(fh)
 
-    log.info('Checking if provided arguments are valid...')
+    log.info('Checking if required arguments are valid...')
     ribocore.check_required_arguments(ribo_file=ribo_file, transcriptome_fasta=transcriptome_fasta)
-    ribocore.check_optional_arguments(ribo_file=ribo_file, read_length=read_length, read_offset=read_offset)
+
+    log.info('Checking read lengths...')
+    ribocore.check_read_lengths(ribo_file=ribo_file, read_lengths=read_lengths)
+    log.info('Done')
+
+    log.info('Checking read offsets...')
+    ribocore.check_read_offsets(read_offsets=read_offsets)
+    log.info('Done')
+
+    log.info('Checking if each read length has a corresponding offset...')
+    ribocore.check_read_lengths_offsets(read_lengths=read_lengths, read_offsets=read_offsets)
     log.info('Done')
 
     with ribocore.open_pysam_file(fname=ribo_file, ftype='bam') as b, ribocore.open_pysam_file(fname=transcriptome_fasta, ftype='fasta') as f:
@@ -98,7 +108,7 @@ def main(args):
         log.info('Get RiboSeq read counts for all transcripts in FASTA')
         for transcript in f.references:
             ribo_counts, ribo_reads = ribocore.get_ribo_counts(ribo_fileobj=b, transcript_name=transcript,
-                                                               read_length=read_length, read_offset=read_offset)
+                                                               read_lengths=read_lengths, read_offsets=read_offsets)
             if not ribo_reads:  # no reads for this transcript. skip.
                 continue
 
@@ -156,12 +166,13 @@ def main(args):
         table_body += '</tbody>'
 
     # only for display in HTML
-    if not read_length:
-        read_length = 'All'
+    valid_lengths = ['{}'.format(item) for item in read_lengths]
+    if len(valid_lengths) == 1 and valid_lengths[0] == '0':
+        valid_lengths = ['All']
 
     if not count:
-        if read_length:
-            log.info('No transcripts found for read length {}'.format(read_length))
+        if len(valid_lengths) >= 1:
+            log.info('No transcripts found for read lengths: {}'.format(', '.join(valid_lengths)))
         else:
             log.info('No transcripts found')
     else:
@@ -171,7 +182,8 @@ def main(args):
             template = 'ribocount.html'
         with open(os.path.join(CONFIG.PKG_DATA_DIR, template)) as g,\
                 open(os.path.join(zip_dir, 'index.html'), 'w') as h:
-            h.write(g.read().format(count=count, length=read_length, prime=prime, table_body=table_body))
+            h.write(g.read().format(count=count, length='{}'.format(', '.join(valid_lengths)),
+                                    prime=prime, table_body=table_body))
 
         for asset in ('css', 'js'):
             asset_dir = os.path.join(zip_dir, asset)
@@ -193,7 +205,7 @@ def main(args):
         log.debug('Writing HTML report')
 
         with open(os.path.join(CONFIG.PKG_DATA_DIR, 'ribocount_index.html')) as j, open(args.html_file, 'w') as k:
-            k.write(j.read().format(count=count, read_length=read_length))
+            k.write(j.read().format(count=count, read_length=', '.join(valid_lengths)))
     log.info('Finished')
 
 
