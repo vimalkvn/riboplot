@@ -2,8 +2,8 @@
 
 History
 =======
-0.3 (2015-12-10)
-----------------
+0.3.0 (2015-12-10)
+------------------
 * Support for multiple read lengths and corresponding offsets.
 * Optional arguments check is now split into multiple steps.
 * Remove the calculation of read lengths present in the BAM alignment. 
