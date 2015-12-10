@@ -11,16 +11,18 @@ mock==1.0.1
 nose==1.3.7
 numpy==1.10.1
 pkginfo==1.2.1
+pudb==2015.4.1
 pyparsing==2.0.6
 pysam==0.8.3
 python-dateutil==2.4.2
 pytz==2015.7
 requests==2.8.1
 requests-toolbelt==0.5.0
--e git+git@github.com:vimalkvn/riboplot.git@cd7c9f74b655129308db007de985047f8079ef93#egg=riboplot-master
+-e git+git@github.com:vimalkvn/riboplot.git@04a55859099c2a5efd3327df4133fe9e4c475f63#egg=riboplot-develop
 six==1.10.0
 snowballstemmer==1.2.0
 sphinx-rtd-theme==0.1.9
 twine==1.6.4
+urwid==1.3.1
 wheel==0.26.0
 wsgiref==0.1.2
