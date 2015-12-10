@@ -28,11 +28,15 @@ If you have RNA-Seq data (sorted BAM), you can select the option to plot RNA cov
 
 5. Read lengths to consider [optional] (Integer - 0 or greater)
 ...............................................................
-If this option is provided, only Ribo-Seq data of the given length is considered.
+If this option is provided, only Ribo-Seq data of the given read length is considered.
+Multiple read lengths can be provided and should be separated by commas. If multiple
+read lengths are input, corresponding read offsets should also be specified. If you
+do not wish to apply an offset, please input 0 for the corresponding offset.
 
-6. Offset [optional] (Integer - 0 or greater)
-.............................................
-If this option is provided, this offset is added to the read alignment positions.
+6. Read offset(s) corresponding to read lengths [optional] (Integer - 0 or greater)
+...................................................................................
+If this option is provided, this offset is added to the read alignment positions. Multiple
+offsets should be separated by commas.
 
 Output
 ------
@@ -90,37 +94,45 @@ Command line
 ------------
 ``riboplot`` can also be run on the command line. The usage is ::
 
-    riboplot [-h] -b RIBO_FILE -f TRANSCRIPTOME_FASTA -t TEXT
-             [-n RNA_FILE] [-l INTEGER] [-s INTEGER] 
-             [-c {default,colorbrewer,rgb,greyorfs}] [-m HTML_FILE]
-             [-o OUTPUT_PATH] [-d]
+    riboplot.py [-h] -b RIBO_FILE -f TRANSCRIPTOME_FASTA -t TEXT
+    [-n RNA_FILE] [-l READ_LENGTHS] [-s READ_OFFSETS]
+    [-c {default,colorbrewer,rgb,greyorfs}] [-m HTML_FILE]
+    [-o OUTPUT_PATH] [-d]
 
 Plot and output read counts for a single transcript
 
-**required arguments**:
-    -b RIBO_FILE, --ribo_file RIBO_FILE
-        Ribo-Seq alignment file in BAM format
-    -f TRANSCRIPTOME_FASTA, --transcriptome_fasta TRANSCRIPTOME_FASTA
-        FASTA format file of the transcriptome
-    -t TEXT, --transcript_name TEXT
-        Transcript name
+optional arguments:
+    -h, --help            show this help message and exit
 
-**optional arguments**:
-    -h, --help  show this help message and exit
-    -n RNA_FILE, --rna_file RNA_FILE
-        RNA-Seq alignment file (BAM)
-    -l INTEGER, --read_length INTEGER
-        Read length to consider (default: None)
-    -s INTEGER, --read_offset INTEGER
-        Read offset (default: 0)
-    -c COLOR_SCHEME, --color_scheme COLOR_SCHEME                
-         Color scheme to use (default: default). Other options are colorbrewer, rgb, greyorfs
+    -n RNA_FILE, --rna_file RNA_FILE    RNA-Seq alignment file (BAM)
+    
+    -l READ_LENGTHS, --read_lengths READ_LENGTHS    
+        Read lengths to consider (default: 0). Multiple read lengths should be 
+        separated by commas. If multiple read lengths are specified, corresponding read offsets 
+        should also be specified. If you do not wish to apply an offset, please input 0 for the corresponding read length
+    
+    -s READ_OFFSETS, --read_offsets READ_OFFSETS
+        Read offsets (default: 0). Multiple read offsets should be separated by commas
+    
+    -c one of default colorbrewer rgb greyorfs, --color_scheme one of default colorbrewer rgb greyorfs
+        Color scheme to use (default: default)
+    
     -m HTML_FILE, --html_file HTML_FILE
         Output file for results (HTML)
+    
     -o OUTPUT_PATH, --output_path OUTPUT_PATH
         Files are saved in this directory
+    
     -d, --debug
         Flag. Produce debug output
+
+required arguments:
+    -b RIBO_FILE, --ribo_file RIBO_FILE Ribo-Seq alignment file in BAM format
+    
+    -f TRANSCRIPTOME_FASTA, --transcriptome_fasta TRANSCRIPTOME_FASTA FASTA format file of the transcriptome
+    
+    -t TEXT, --transcript_name TEXT Transcript name
+
 
 .. links
 
