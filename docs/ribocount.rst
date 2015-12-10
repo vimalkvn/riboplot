@@ -18,11 +18,15 @@ A FASTA format file with sequences of the transcripts.
 
 3. Read lengths to consider [optional] (Integer - 0 or greater)
 ...............................................................
-If this option is provided, only Ribo-Seq data of the given length is considered.
+If this option is provided, only Ribo-Seq data of the given read length is considered.
+Multiple read lengths can be provided and should be separated by commas. If multiple
+read lengths are input, corresponding read offsets should also be specified. If you
+do not wish to apply an offset, please input 0 for the corresponding offset.
 
-4. Offset [optional] (Integer - 0 or greater)
-.............................................
-If this option is provided, this offset is added to the read alignment positions.
+4. Read offset(s) corresponding to read lengths [optional] (Integer - 0 or greater)
+...................................................................................
+If this option is provided, this offset is added to the read alignment positions. Multiple
+offsets should be separated by commas.
 
 5. Restrict read counts
 .......................
@@ -47,30 +51,46 @@ Command line
 ------------
 ``ribocount`` can also be run on the command line. The usage is ::
 
-    ribocount [-h] -b RIBO_FILE -f TRANSCRIPTOME_FASTA [-l INTEGER]
-                    [-s INTEGER] [-v | -r] [-m HTML_FILE] [-o OUTPUT_PATH]
-                    [-d]
+    ribocount.py [-h] -b RIBO_FILE -f TRANSCRIPTOME_FASTA [-l READ_LENGTHS]
+                 [-s READ_OFFSETS] [-v | -r] [-m HTML_FILE]
+                 [-o OUTPUT_PATH] [-d]
 
-    Output read counts for all transcripts
+Output read counts for all transcripts
 
 **required arguments**:
     -b RIBO_FILE, --ribo_file RIBO_FILE
         Ribo-Seq alignment file in BAM format
+
     -f TRANSCRIPTOME_FASTA, --transcriptome_fasta TRANSCRIPTOME_FASTA
         FASTA format file of the transcriptome
 
 **optional arguments**:
     -h, --help            show this help message and exit
+
+    -l READ_LENGTHS, --read_lengths READ_LENGTHS
+        Read lengths to consider (default: 0). Multiple read lengths should be
+        separated by commas. If multiple read lengths are specified, corresponding read offsets
+        should also be specified. If you do not wish to apply an offset, please input 0 for the corresponding read length
+
+    -s READ_OFFSETS, --read_offsets READ_OFFSETS
+        Read offsets (default: 0). Multiple read offsets should be separated by commas
+
     -l INTEGER, --read_length INTEGER
         Read length to consider (default: None)
+
     -s INTEGER, --read_offset INTEGER
         Read offset (default: 0)
+
     -v, --count_five      Flag. Output reads in 5' region
+
     -r, --count_three     Flag. Output reads in 3' region
+
     -m HTML_FILE, --html_file HTML_FILE
         Output file for results (HTML)
+
     -o OUTPUT_PATH, --output_path OUTPUT_PATH
         Files are saved in this directory
+
     -d, --debug           Flag. Produce debug output
 
 .. links
