@@ -33,10 +33,14 @@ def create_parser():
     required.add_argument('-f', '--transcriptome_fasta', help='FASTA format file of the transcriptome', required=True)
 
     # optional arguments
-    parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
-    parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
+    parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s). '
+                        'Multiple read lengths should be separated by commas. If multiple read lengths '
+                        'are specified, corresponding read offsets should also be specified. If you do '
+                        'not wish to apply an offset, please input 0 for the corresponding read length',
+                        default='0', type=ribocore.lengths_offsets)
+    parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s). '
+                        'Multiple read offsets should be separated by commas',
+                        default='0', type=ribocore.lengths_offsets)
 
     count_group = parser.add_mutually_exclusive_group()
     count_group.add_argument('-v', '--count_five', help='Flag. Output reads in 5\' region', action='store_true')

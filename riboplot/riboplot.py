@@ -36,11 +36,6 @@ CONFIG = config.ProductionConfig()
 # create logger
 log = logging.getLogger('riboplot')
 
-if len(log.handlers):
-    # remove the stream handler
-    print log.handlers
-    log.handlers.pop()
-
 
 class ErrorLogFormatter(logging.Formatter):
     """Custom error log format for the HTML file"""
@@ -307,10 +302,14 @@ def create_parser():
 
     # plot function - optional arguments
     parser.add_argument('-n', '--rna_file', help='RNA-Seq alignment file (BAM)')
-    parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
-    parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s)',
-                        metavar='Comma separated list of integers', default='0', type=ribocore.lengths_offsets)
+    parser.add_argument('-l', '--read_lengths', help='Read lengths to consider (default: %(default)s). '
+                        'Multiple read lengths should be separated by commas. If multiple read lengths '
+                        'are specified, corresponding read offsets should also be specified. If you do '
+                        'not wish to apply an offset, please input 0 for the corresponding read length',
+                        default='0', type=ribocore.lengths_offsets)
+    parser.add_argument('-s', '--read_offsets', help='Read offsets (default: %(default)s). '
+                        'Multiple read offsets should be separated by commas',
+                        default='0', type=ribocore.lengths_offsets)
     parser.add_argument('-c', '--color_scheme', help='Color scheme to use (default: %(default)s)',
                         choices=['default', 'colorbrewer', 'rgb', 'greyorfs'], default='default')
     parser.add_argument('-m', '--html_file', help='Output file for results (HTML)', default='riboplot.html')
@@ -332,13 +331,6 @@ def main(args):
     fh.setLevel(logging.ERROR)
     fh.setFormatter(ErrorLogFormatter('%(message)s'))
     log.addHandler(fh)
-
-    ch = logging.StreamHandler()
-    if args.debug:
-        ch.setLevel(logging.DEBUG)
-    else:
-        ch.setLevel(logging.INFO)
-    log.addHandler(ch)
 
     log.debug('Supplied arguments\n{}'.format(
         '\n'.join(['{:<20}: {}'.format(k, v) for k, v in vars(args).items()])))

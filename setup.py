@@ -22,7 +22,7 @@ test_requirements = [
 
 setup(
     name='riboplot',
-    version='0.2.5',
+    version='0.3',
     description="Plot read counts of RiboSeq data from BAM format alignment files",
     long_description=readme + '\n\n' + history,
     author="Vimalkumar Velayudhan",
