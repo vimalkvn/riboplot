@@ -2,6 +2,10 @@
 
 History
 =======
+0.3.1 (2017-03-04)
+------------------
+* Bugfix: ribocount: allow creation of zip files larger than 2GB.
+
 0.3.0 (2015-12-10)
 ------------------
 * Support for multiple read lengths and corresponding offsets.

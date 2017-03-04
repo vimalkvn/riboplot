@@ -200,7 +200,7 @@ def main(args):
 
         log.info('Creating zip file')
         os.chdir(output_path)
-        with zipfile.ZipFile('ribocount_output.zip', 'w') as zipf:
+        with zipfile.ZipFile('ribocount_output.zip', 'w', allowZip64=True) as zipf:
             for root, d, f in os.walk('ribocount_output'):
                 for name in f:
                     zipf.write(os.path.join(root, name))
