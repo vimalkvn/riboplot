@@ -44,7 +44,5 @@ output/*/index.html
 docs/_build
 
 .hg*
-tests/data/*.bam*
-tests/data/*.fna*
 riboplot/riboplot_multi.py
 
